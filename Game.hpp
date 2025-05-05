@@ -1,0 +1,1 @@
+//all accesories needed like: coins, board game etc
