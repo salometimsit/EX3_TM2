@@ -6,4 +6,5 @@ class Actionstrategy{
         virtual void playcard(Player& currplayer,Player& other){playcard(currplayer);}
         virtual std::string getactionname();
         virtual bool isType(const std::string& type) const;
-};                                     
+};
+#endif                                     
