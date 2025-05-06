@@ -12,5 +12,5 @@ class Player{
         const Role* getrole(return role.get());
         void addcoin(int amount){coins+=amount;} 
         void removecoin(int amount){if(coins>amount){coins-=amount;}else{throw::std::runtime_error("not enough coins");}}//return error if amount>valid 
-
+    //is role / set role / eliminate / activate 
 };
