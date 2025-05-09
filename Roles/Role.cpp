@@ -1,5 +1,8 @@
-#include "Role.hpp"
-using std namespace;
+#include "Roles/Role.hpp"
+#include "Actions/ActionFactory.hpp"
+using  namespace std;
+#include <iostream>
+
 Role::Role(Type type) : type_(type) {}
 string Role::getrolename() const{
     switch(type_){
@@ -13,17 +16,21 @@ string Role::getrolename() const{
     }
 
 }
-void Role:: roleonaction(Player& currplayer,Action& actionname,Player& other){
+void Role::roleonaction(Player& currplayer,Action actionname,Player* other)const{
+    if (type_ == Type::Spy && other != nullptr) {
+        std::cout << "player: " << other->getnameplayer() << ", coins: " << other->getcoins() << std::endl;
+    }
     switch(type_){
         case Type::Governor:
             if(actionname.isType("Tax")){
                 break;
             }
             break;
-        case Type::Spy:
-            int othercoins=other.getcoins();
-            cout<<"player:"<<other.getnameplayer()<<"number of coins:"<<othercoins<<endl;
+        case Type::Spy:{
+            int othercoins=other->getcoins();
+            cout<<"player:"<<other->getnameplayer()<<"number of coins:"<<othercoins<<endl;
             break;
+        }
         case Type::Baron:
             break;
         case Type::Judge:
@@ -39,35 +46,35 @@ void Role:: roleonaction(Player& currplayer,Action& actionname,Player& other){
             }
     }
 }
-void Role:: roledefence(Player& currplayer,Action& actionname,Player& other){
+void Role:: roledefence(Player& currplayer,Action action,Player& other)const{
     switch(type_){
         case Type::Governor:
             break;
         case Type::Spy:
             break;
         case Type::Baron:
-            if(actionname.isType("Sanction")){
+            if(action.isType("Sanction")){
                 currplayer.addcoin(1);
             }
             break;
         case Type::Judge:
-            if(actionname.isType("Sanction")){
+            if(action.isType("Sanction")){
                 other.removecoin(1);
             }
             break;
         case Type::Merchant:
-            if(actionname.isType("Arrest")){
+            if(action.isType("Arrest")){
                 currplayer.removecoin(1);
             }
             break;
         case Type::General:
-            if(actionname.isType("Arrest")){
+            if(action.isType("Arrest")){
                 currplayer.addcoin(1);
             }
             break;
     }
 }
-bool Role::canblock(const Action& action) const{
+bool Role::canblock(const std::string& action) const{
     switch(type_){
         case Type::Governor:
             return action == "Tax";

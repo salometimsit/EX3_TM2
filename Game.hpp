@@ -1,27 +1,46 @@
-//all accesories needed like: coins, board game etc
-#ifindef GAME_HPP
+// Game.hpp - Improved
+#ifndef GAME_HPP
 #define GAME_HPP
-#include "Actions/ActionFactory.hpp"
+
+
 #include "Roles/RoleFactory.hpp"
 #include "Player.hpp"
+#include "PlayerManager.hpp"
+#include "Actions/ActionFactory.hpp"
 #include <iostream>
 #include <vector>
 #include <memory>
 #include <string>
 #include <stdexcept>
+
 class Game {
-    private:
-        std::vector<std::unique_ptr<Player>> players;
-        int currentPlayerIndex;
-        int totalPlayers;
-        int totalCoins;
-        int maxCoins;
-        std::string actionName;
-    public:
-        Game(int numPlayers, int maxCoins);
-        void addPlayer(const std::string& name, const std::string& roleName);
-        void startGame();
-        void playTurn();
-        void performAction(Player& player, const std::string& actionName);
-        void endGame();
+private:
+    PlayerManager playerManager;
+    
+    int currentPlayerIndex;
+    
+public:
+    bool gameOver;
+    Game() : gameOver(false), currentPlayerIndex(0) {}
+    
+    void addPlayer(const std::string& name);
+    void startGame();
+    std::string winner() const;
+    void playTurn(const Action& action, int targetIndex=-1);
+    void moveToNextPlayer();
+    bool checkGameOver();
+    void endGame();
+    int countplayers() const { return playerManager.playerCount(); }
+    // Helper methods for GUI
+    std::vector<std::string> playersList();
+    std::string turn() const;
+
+
+    Player* getCurrentPlayer();
+    int getCurrentPlayerCoins();
+    std::string getCurrentPlayerRole();
+    int getPlayerIndexByName(const std::string& name);
+    Player* getPlayerByIndex(int index);
 };
+
+#endif // GAME_HPP
