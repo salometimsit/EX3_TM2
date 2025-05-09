@@ -1,5 +1,4 @@
 #include "ActionFactory.hpp"
-
 std::unique_ptr<Action> ActionFactory::createAction(const std::string& actionName) {
     if (actionName == "Gather") {
         return std::make_unique<Action>(Action::ActionType::Gather);

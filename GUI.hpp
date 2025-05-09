@@ -14,6 +14,7 @@ class GUI : public QMainWindow {
     Q_OBJECT
 
 public:
+
     explicit GUI(Game& g, QWidget* parent = nullptr);
 
 private slots:

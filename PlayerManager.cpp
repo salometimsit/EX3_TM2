@@ -14,6 +14,7 @@ bool PlayerManager::addPlayer(unique_ptr<Player> player) {
     return true; 
 }
 
+
 bool PlayerManager::isplayervalid() const {
     if(players.size() < MIN_PLAYERS) {
         throw std::runtime_error("Not enough players to start the game");

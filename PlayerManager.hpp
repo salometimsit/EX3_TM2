@@ -16,6 +16,7 @@ struct PlayerManager{
         static constexpr int MAX_PLAYERS = 6;
         std::vector<unique_ptr<Player>> players;
 
+        
         bool addPlayer(unique_ptr<Player> player) ;
         bool isplayervalid()const;
         bool isplayerindexvalid(int index);

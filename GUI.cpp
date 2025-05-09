@@ -11,6 +11,7 @@
 #include <QApplication>
 #include "Actions/ActionFactory.hpp"
 
+
 GUI::GUI(Game& g, QWidget* parent) : QMainWindow(parent), game(g) {
     QWidget* central = new QWidget(this);
     QVBoxLayout* mainLayout = new QVBoxLayout(central);

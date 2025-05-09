@@ -3,7 +3,6 @@
 #include <string>
 #include <stdexcept>
 
-
 bool Action::isType(const std::string& type) const {
     switch (action) {
         case ActionType::Arrest:

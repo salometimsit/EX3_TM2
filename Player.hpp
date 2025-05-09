@@ -14,6 +14,7 @@ class Player{
         int coins;
         std::unique_ptr<Role> role;
     public:
+    
         std::unique_ptr<Role> assignroles(){
             std::random_device rd;
             std::mt19937 g(rd());

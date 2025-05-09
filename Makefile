@@ -17,6 +17,7 @@ TARGET = coup_game
 
 all: $(TARGET)
 
+
 # Automatically generate moc_GUI.cpp before compiling GUI.o
 moc_GUI.cpp: GUI.hpp
 	moc GUI.hpp -o moc_GUI.cpp

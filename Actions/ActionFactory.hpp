@@ -8,4 +8,5 @@ class ActionFactory{
     public:
         static std::unique_ptr<Action> createAction(const std::string& actionName);
 };
+
 #endif

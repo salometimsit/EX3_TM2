@@ -2,7 +2,6 @@
 #define ACTION_HPP
 #include <string>
 #include "Player.hpp"
-
 class Action {
 public:
     enum class ActionType {
