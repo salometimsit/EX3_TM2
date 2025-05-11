@@ -1,5 +1,6 @@
 #include "Roles/Role.hpp"
 #include "Actions/ActionFactory.hpp"
+#include "Game.hpp"
 using  namespace std;
 #include <iostream>
 
@@ -23,12 +24,11 @@ void Role::roleonaction(Player& currplayer,Action actionname,Player* other)const
     switch(type_){
         case Type::Governor:
             if(actionname.isType("Tax")){
+                currplayer.addcoin(1);
                 break;
             }
             break;
         case Type::Spy:{
-            int othercoins=other->getcoins();
-            cout<<"player:"<<other->getnameplayer()<<"number of coins:"<<othercoins<<endl;
             break;
         }
         case Type::Baron:
@@ -46,7 +46,44 @@ void Role::roleonaction(Player& currplayer,Action actionname,Player* other)const
             }
     }
 }
+int Role::rolespecialities(Player& currplayer,Game& game, Player* other)const{
+    switch(type_){
+        case Type::Governor:
+            return 0;
+        case Type::Spy:{
+            if (other) {
+                game.blockarrestfornext(*other);
+                return other->getcoins();
+            } else {
+                std::cerr << "[ERROR] Spy special ability called with null target!\n";
+                return 0;
+            }
+        }
+        case Type::Baron:
+        if(currplayer.getcoins()>=3){
+            currplayer.removecoin(3);
+            currplayer.addcoin(6);
+            
+        }
+        return 0;
+        
+        case Type::Judge:
+            return 0;
+        case Type::Merchant:
+            if(currplayer.getcoins()>3){
+                currplayer.addcoin(1);
+            }
+            return 0;
+        case Type::General:
+           return 0;
+        default:
+            return 0;
+    }
+}
 void Role:: roledefence(Player& currplayer,Action action,Player& other)const{
+    if(action.isType("Arrest")){
+        other.addcoin(1);
+    }
     switch(type_){
         case Type::Governor:
             break;
@@ -59,7 +96,7 @@ void Role:: roledefence(Player& currplayer,Action action,Player& other)const{
             break;
         case Type::Judge:
             if(action.isType("Sanction")){
-                other.removecoin(1);
+                other.removecoin(2);
             }
             break;
         case Type::Merchant:
@@ -74,20 +111,20 @@ void Role:: roledefence(Player& currplayer,Action action,Player& other)const{
             break;
     }
 }
-bool Role::canblock(const std::string& action) const{
-    switch(type_){
+bool Role::canblock(const Action& action) const{
+    switch (type_) {
         case Type::Governor:
-            return action == "Tax";
+            return action.isType("Tax");
         case Type::Spy:
-            return action == "Arrest";
+            return action.isType("Arrest");
         case Type::Baron:
             return false;
         case Type::Judge:
-            return action == "Bribe";
+            return action.isType("Bribe");
         case Type::Merchant:
             return false;
         case Type::General:
-            return action == "Coup";
+            return action.isType("Coup");
         default:
             return false;
     }

@@ -25,7 +25,7 @@ bool PlayerManager::isplayervalid() const {
     return true;
 }
 
-bool PlayerManager::isplayerindexvalid(int index) {
+bool PlayerManager::isplayerindexvalid(int index)const {
     if(index < 0 || static_cast<size_t>(index) >= players.size()) {
         return false;
     }

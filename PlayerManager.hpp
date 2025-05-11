@@ -19,7 +19,7 @@ struct PlayerManager{
         
         bool addPlayer(unique_ptr<Player> player) ;
         bool isplayervalid()const;
-        bool isplayerindexvalid(int index);
+        bool isplayerindexvalid(int index)const;
         void shuffleplayers();
         void eliminateplayer(int index);
         size_t playerCount() const;

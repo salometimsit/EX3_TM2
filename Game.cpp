@@ -24,6 +24,16 @@ void Game::addPlayer(const string& name) {
 }
 
 void Game::startGame() {
+    std::cout << "[DEBUG] startGame() called\n";
+    std::cout << "[DEBUG] players count: " << playerManager.players.size() << "\n";
+
+    for (size_t i = 0; i < playerManager.players.size(); ++i) {
+        if (!playerManager.players[i]) {
+            std::cout << "[ERROR] player " << i << " is null\n";
+        } else {
+            std::cout << "[DEBUG] player " << i << " name: " << playerManager.players[i]->getnameplayer() << "\n";
+        }
+    }
     if (playerManager.isplayervalid()) {
         cout << "Game started with " << playerManager.players.size() << " players." << endl;
         playerManager.shuffleplayers();
@@ -41,36 +51,35 @@ void Game::playTurn(const Action& action, int targetIndex) {
     }
     
     Player& currentPlayer = *playerManager.players[currentPlayerIndex];
+    if (action.isType("Arrest")) {
+        std::string currentName = currentPlayer.getnameplayer();
+        if (isarrestblocked(currentPlayer)) {
+            clearArrestBlock(currentPlayer); // Only block once
+            throw std::runtime_error("You are blocked from using Arrest this turn (Spy effect).");
+        }
+    }
     Player* targetPlayer = nullptr;
-    cout << "Current player: " << currentPlayer.getnameplayer() << endl;
-    cout<<"current player index: "<<currentPlayerIndex<<endl;
-    std::cout << "[DEBUG] Role: " << (currentPlayer.getrole() ? currentPlayer.getrole()->getrolename() : "null") << std::endl;
-   
-    
     // Check if player has more than 10 coins and must play coup
     if (currentPlayer.getcoins() > 10 && !action.isType("Coup")) {
-        cout << "You have more than 10 coins. You must play Coup." << endl;
         throw std::runtime_error("You have more than 10 coins. You must play coup.");
     }
     cout << "Players vector size: " << playerManager.players.size() << endl;
     
     
     if (playerManager.isplayerindexvalid(targetIndex)) {
-        cout<<"enetred if"<<endl;
         targetPlayer = playerManager.players[targetIndex].get();
         action.playcard(currentPlayer, *targetPlayer);
-        cout<<"action played: "<<action.getactionname()<<endl;
         
         if (targetPlayer) {
             action.playcard(currentPlayer, *targetPlayer);
             if (action.isType("Coup")) {
                 playerManager.eliminateplayer(targetIndex);
             }
+
         }
 
     } 
     else {
-        cout<<"entered else"<<endl;
         action.playcard(currentPlayer);
     }
     
@@ -151,6 +160,10 @@ std::string Game::turn() const {
 
 
 Player* Game::getCurrentPlayer() {
+    if (currentPlayerIndex < 0 || currentPlayerIndex >= playerManager.players.size()) {
+        std::cout << "[ERROR] getCurrentPlayer(): invalid index\n";
+        return nullptr;
+    }
     if (currentPlayerIndex >= 0 && 
         currentPlayerIndex < playerManager.players.size() && 
         playerManager.players[currentPlayerIndex]) {
@@ -185,4 +198,19 @@ int Game::getPlayerIndexByName(const std::string& name) {
 }
 Player* Game::getPlayerByIndex(int index) {
     return playerManager.getPlayerByIndex(index);
+}
+
+void Game::blockaction(Player& blocker, const Action& action, Player& attacker){
+    if(blocker.getrole()){
+        if(blocker.getrole()->canblock(action)){
+            blocker.getrole()->roledefence(blocker,action,attacker);
+        }
+    }
+    else{
+        throw std::runtime_error("blocker has no role");
+    }
+}
+bool Game::canblock(const Action& action) const {
+    return playerManager.isplayerindexvalid(currentPlayerIndex) &&
+           playerManager.players[currentPlayerIndex]->getrole()->canblock(action);
 }

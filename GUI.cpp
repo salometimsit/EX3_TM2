@@ -25,6 +25,7 @@ GUI::GUI(Game& g, QWidget* parent) : QMainWindow(parent), game(g) {
     // === Add Player Screen ===
     addPlayerScreen = new QWidget();
     addPlayerScreen->setObjectName("AddPlayerScreen");
+    
     QPixmap addBg("/home/salome/projects/EX3/images/player_background.jpg");
     addBg = addBg.scaled(600, 800, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation); // or your fixed size
 
@@ -91,11 +92,16 @@ GUI::GUI(Game& g, QWidget* parent) : QMainWindow(parent), game(g) {
     }
 
     spyButton = new QPushButton("Spy on Player");
+    BaronButton = new QPushButton("Barons investment");
+    BaronButton->setStyleSheet("font-size: 18px; padding: 6px; color: #D4AF37; background-color: rgba(0,0,0,0.6); border: 1px solid #D4AF37;");
     spyButton->setStyleSheet("font-size: 18px; padding: 6px; color: #D4AF37; background-color: rgba(0,0,0,0.6); border: 1px solid #D4AF37;");
     actionLayout->addWidget(spyButton);
+    actionLayout->addWidget(BaronButton);
     spyButton->hide();
+    BaronButton->hide();
 
     connect(spyButton, &QPushButton::clicked, this, &GUI::handleSpyAction);
+    connect(BaronButton, &QPushButton::clicked, this, &GUI::handleBaronAction);
 
     actionGroup->setLayout(actionLayout);
     actionGroup->setVisible(false);
@@ -104,6 +110,7 @@ GUI::GUI(Game& g, QWidget* parent) : QMainWindow(parent), game(g) {
     stackedLayout->addWidget(addPlayerScreen);
     stackedLayout->addWidget(gameScreen);
     stackedLayout->setCurrentWidget(addPlayerScreen);
+    qDebug() << "GUI ready, showing AddPlayer screen";
 }
 
 
@@ -145,8 +152,12 @@ void GUI::handleAction(const QString& actionName) {
     try {
         ActionFactory factory;
         std::unique_ptr<Action> action = factory.createAction(actionName.toStdString());
+        bool needsTarget = false;
 
-        bool needsTarget = action->isType("Arrest") || action->isType("Sanction") || action->isType("Coup");
+        if (action->isType("Arrest") || action->isType("Sanction") || action->isType("Coup")) {
+            needsTarget = true;
+        }
+
         int targetIndex = -1;
 
         if (needsTarget) {
@@ -170,30 +181,44 @@ void GUI::handleAction(const QString& actionName) {
             QString targetName = QString::fromStdString(targetPlayer->getnameplayer());
 
             // Ask target player if they want to block
-            QMessageBox::StandardButton reply;
-            reply = QMessageBox::question(this, "Block Action",
-                targetName + ", do you want to block the action: " + actionName + "?",
-                QMessageBox::Yes | QMessageBox::No);
+            if (targetPlayer->getrole() && targetPlayer->getrole()->canblock(*action)) {
+                QMessageBox::StandardButton reply;
+                reply = QMessageBox::question(this, "Block Action",
+                    targetName + ", do you want to block the action: " + actionName + "?",
+                    QMessageBox::Yes | QMessageBox::No);
 
-            if (reply == QMessageBox::Yes) {
-                try {
-                    game.blockaction(*targetPlayer, *action, *game.getCurrentPlayer());
-                    QMessageBox::information(this, "Blocked", "The action was blocked!");
-                    return; // Don't play the action
-                } catch (const std::exception& e) {
-                    QMessageBox::warning(this, "Block Failed", e.what());
+                if (reply == QMessageBox::Yes) {
+                    try {
+                        game.blockaction(*targetPlayer, *action, *game.getCurrentPlayer());
+                        QMessageBox::information(this, "Blocked", "The action was blocked!");
+                        updateGameView();
+                        return;
+                    } catch (const std::exception& e) {
+                        QMessageBox::warning(this, "Block Failed", e.what());
+                        return;
+                    }
                 }
             }
+
+            // If not blocked, continue with the action
+            game.playTurn(*action, targetIndex);
+            updateGameView();
         }
 
-        // If not blocked, continue with the action
-        game.playTurn(*action, targetIndex);
-        updateGameView();
+        // Handle actions that don't require a target
+        if (!needsTarget) {
+            game.playTurn(*action, -1);
+            updateGameView();
+        }
 
     } catch (const std::exception& e) {
         QMessageBox::warning(this, "Action Error", e.what());
     }
 }
+
+
+
+
 
 void GUI::handleSpyAction() {
     bool ok;
@@ -202,7 +227,6 @@ void GUI::handleSpyAction() {
         if (name != game.turn())
             items << QString::fromStdString(name);
     }
-
     QString selected = QInputDialog::getItem(this, "Spy", "Choose a player to spy on:", items, 0, false, &ok);
     if (!ok) return;
 
@@ -211,12 +235,36 @@ void GUI::handleSpyAction() {
         Player* current = game.getCurrentPlayer();
         Player* target = game.getPlayerByIndex(targetIndex);
         if (current && target && current->getrole()) {
-            Action dummy(Action::ActionType::Tax); // Safe dummy
-            current->getrole()->roleonaction(*current, dummy,target);
+            int others_coins = current->getrole()->rolespecialities(*current, game, target);
+            QMessageBox::information(this, "Spy",
+            "You spied on " + QString::fromStdString(target->getnameplayer()) +
+            ". They have " + QString::number(others_coins) + " coins.\n"
+            "They are now blocked from using Arrest next turn.");
         }
+
         updateGameView();
     }
 }
+void  GUI::handleBaronAction(){
+    Player* current = game.getCurrentPlayer();
+    if (current->getcoins() < 3) {
+        QMessageBox::warning(this, "Insufficient Coins", "You need at least 3 coins to use Baron's ability.");
+        return;
+    }
+    bool ok;
+    QStringList items;
+    for (const auto& name : game.playersList()) {
+        if (name != game.turn())
+            items << QString::fromStdString(name);
+    }
+    QString selected = QInputDialog::getItem(this, "Baron", "Invest 3 coins get 6:", items, 0, false, &ok);
+    if (!ok) return;
+    if (current && current->getrole()) {
+        current->getrole()->rolespecialities(*current,game);
+    }
+    updateGameView();
+}
+
 
 void GUI::updateGameView() {
     std::string current = game.turn();
@@ -229,5 +277,6 @@ void GUI::updateGameView() {
         statusLabel->setText("Turn: " + QString::fromStdString(current) + " | Role: " + role + " | Coins: " + QString::number(coins));
 
         spyButton->setVisible(role == "Spy");
+        BaronButton->setVisible(role == "Baron");
     }
 }

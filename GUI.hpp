@@ -23,6 +23,7 @@ private slots:
     void startGame();
     void handleAction(const QString& actionName);
     void handleSpyAction();
+    void handleBaronAction();
     void updateGameView();
 
 private:
@@ -33,6 +34,7 @@ private:
     QGroupBox* actionGroup;
     std::vector<QPushButton*> actionButtons;
     QPushButton* spyButton;
+    QPushButton* BaronButton;
     QWidget* addPlayerScreen;
     QWidget* gameScreen;
     QStackedLayout* stackedLayout;

@@ -25,7 +25,6 @@ bool Action::isType(const std::string& type) const {
 void Action::playcard(Player& currplayer) const{
     switch (action) {
         case ActionType::Arrest:
-            currplayer.addcoin(1);
             break;
         case ActionType::Bribe:
             currplayer.removecoin(4);
@@ -50,6 +49,7 @@ void Action::playcard(Player& currplayer) const{
 void Action::playcard(Player& currplayer, Player& other)const {
     switch (action) {
         case ActionType::Arrest:
+            
             currplayer.addcoin(1);
             other.removecoin(1);
             break;
