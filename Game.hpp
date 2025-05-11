@@ -17,7 +17,6 @@
 class Game {
 private:
     PlayerManager playerManager;
-    
     int currentPlayerIndex;
     
 public:
@@ -32,6 +31,11 @@ public:
     bool checkGameOver();
     void endGame();
     int countplayers() const { return playerManager.playerCount(); }
+    void blockaction(Player& blocker, Action& action, Player& source) const {
+    if (blocker.getrole()) {
+        blocker.getrole()->roledefence(blocker, action, source);
+    }
+}
     // Helper methods for GUI
     std::vector<std::string> playersList();
     std::string turn() const;

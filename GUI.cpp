@@ -4,6 +4,9 @@
 #include <QGroupBox>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QDebug>
+#include <QFile>
+#include <QPixmap>
 #include <QPushButton>
 #include <QLabel>
 #include <QListWidget>
@@ -14,72 +17,128 @@
 
 GUI::GUI(Game& g, QWidget* parent) : QMainWindow(parent), game(g) {
     QWidget* central = new QWidget(this);
-    QVBoxLayout* mainLayout = new QVBoxLayout(central);
+    setCentralWidget(central);
+
+    stackedLayout = new QStackedLayout();
+    central->setLayout(stackedLayout);
+
+    // === Add Player Screen ===
+    addPlayerScreen = new QWidget();
+    addPlayerScreen->setObjectName("AddPlayerScreen");
+    QPixmap addBg("/home/salome/projects/EX3/images/player_background.jpg");
+    addBg = addBg.scaled(600, 800, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation); // or your fixed size
+
+    QPalette addPalette;
+    addPalette.setBrush(QPalette::Window, addBg);
+    addPlayerScreen->setAutoFillBackground(true);
+    addPlayerScreen->setPalette(addPalette);
+    QVBoxLayout* addLayout = new QVBoxLayout(addPlayerScreen);
+    addLayout->setContentsMargins(150, 300, 150, 100);
+
+    nameInput = new QLineEdit();
+    nameInput->setPlaceholderText("Enter player name");
+    addLayout->addWidget(nameInput);
+
+    QPushButton* addBtn = new QPushButton("ADD");
+    QPushButton* startBtn = new QPushButton("START");
+    errorLabel = new QLabel();
+    errorLabel->setStyleSheet("color: red; font-size: 16px");
+
+    addLayout->addWidget(addBtn);
+    addLayout->addWidget(startBtn);
+    addLayout->addWidget(errorLabel);
+
+    connect(addBtn, &QPushButton::clicked, this, &GUI::addPlayer);
+    connect(startBtn, &QPushButton::clicked, this, &GUI::startGame);
+    
+
+    // === Main Game Screen ===
+    gameScreen = new QWidget(this);  // Ensure parent is set
+    addPlayerScreen->setObjectName("AddPlayerScreen");
+    gameScreen->setObjectName("GameScreen");
+
+    QPixmap gameBg("/home/salome/projects/EX3/images/main_background.jpg");
+    gameBg = gameBg.scaled(600, 800, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+    QPalette gamePalette;
+    gamePalette.setBrush(QPalette::Window, gameBg);
+
+    gameScreen->setAutoFillBackground(true);
+    gameScreen->setPalette(gamePalette);
+
+    QVBoxLayout* mainLayout = new QVBoxLayout(gameScreen);
+    mainLayout->setContentsMargins(20, 20, 20, 20);  // Optional spacing from edge
 
     statusLabel = new QLabel("Welcome to Coup");
+    statusLabel->setStyleSheet("color: #F9E79F; font-size: 20px; font-weight: bold;"); // Optional style
     mainLayout->addWidget(statusLabel);
 
     playerList = new QListWidget();
     mainLayout->addWidget(playerList);
 
-    QHBoxLayout* addPlayerLayout = new QHBoxLayout();
-    playerNameInput = new QLineEdit();
-    QPushButton* addPlayerButton = new QPushButton("Add Player");
-    addPlayerLayout->addWidget(playerNameInput);
-    addPlayerLayout->addWidget(addPlayerButton);
-    mainLayout->addLayout(addPlayerLayout);
-
-    QPushButton* startGameButton = new QPushButton("Start Game");
-    mainLayout->addWidget(startGameButton);
-
     actionGroup = new QGroupBox("Actions");
     QVBoxLayout* actionLayout = new QVBoxLayout();
-    for (const QString& act : {"Gather", "Tax", "Bribe", "Arrest", "Sanction", "Coup"}) {
+
+    QStringList actions = {"Gather", "Tax", "Bribe", "Arrest", "Sanction", "Coup"};
+    for (const QString& act : actions) {
         QPushButton* btn = new QPushButton(act);
+        btn->setStyleSheet("font-size: 18px; padding: 6px; color: #D4AF37; background-color: rgba(0,0,0,0.6); border: 1px solid #D4AF37;");
         actionButtons.push_back(btn);
         actionLayout->addWidget(btn);
+
         connect(btn, &QPushButton::clicked, this, [this, act]() {
             handleAction(act);
         });
     }
 
     spyButton = new QPushButton("Spy on Player");
+    spyButton->setStyleSheet("font-size: 18px; padding: 6px; color: #D4AF37; background-color: rgba(0,0,0,0.6); border: 1px solid #D4AF37;");
     actionLayout->addWidget(spyButton);
     spyButton->hide();
+
     connect(spyButton, &QPushButton::clicked, this, &GUI::handleSpyAction);
 
     actionGroup->setLayout(actionLayout);
     actionGroup->setVisible(false);
     mainLayout->addWidget(actionGroup);
 
-    connect(addPlayerButton, &QPushButton::clicked, this, &GUI::addPlayer);
-    connect(startGameButton, &QPushButton::clicked, this, &GUI::startGame);
-
-    setCentralWidget(central);
-    resize(600, 500);
+    stackedLayout->addWidget(addPlayerScreen);
+    stackedLayout->addWidget(gameScreen);
+    stackedLayout->setCurrentWidget(addPlayerScreen);
 }
 
+
 void GUI::addPlayer() {
-    QString name = playerNameInput->text().trimmed();
+    QString name = nameInput->text().trimmed();
     if (name.isEmpty()) return;
 
     try {
         game.addPlayer(name.toStdString());
-        playerList->addItem(name);
-        playerNameInput->clear();
+        nameInput->clear();
+        errorLabel->setText("");
     } catch (const std::exception& e) {
-        QMessageBox::warning(this, "Error", e.what());
+        errorLabel->setText(e.what());
     }
 }
+
 
 void GUI::startGame() {
     try {
         game.startGame();
+
+        // Setup player list
+        playerList->clear();
+        for (const auto& name : game.playersList()) {
+            playerList->addItem(QString::fromStdString(name));
+        }
+
         updateGameView();
         actionGroup->setVisible(true);
+        stackedLayout->setCurrentWidget(gameScreen);
+        gameScreen->update();
     } catch (const std::exception& e) {
         QMessageBox::critical(this, "Start Failed", e.what());
     }
+
 }
 
 void GUI::handleAction(const QString& actionName) {
@@ -106,6 +165,28 @@ void GUI::handleAction(const QString& actionName) {
             }
         }
 
+        if (needsTarget && targetIndex >= 0) {
+            Player* targetPlayer = game.getPlayerByIndex(targetIndex);
+            QString targetName = QString::fromStdString(targetPlayer->getnameplayer());
+
+            // Ask target player if they want to block
+            QMessageBox::StandardButton reply;
+            reply = QMessageBox::question(this, "Block Action",
+                targetName + ", do you want to block the action: " + actionName + "?",
+                QMessageBox::Yes | QMessageBox::No);
+
+            if (reply == QMessageBox::Yes) {
+                try {
+                    game.blockaction(*targetPlayer, *action, *game.getCurrentPlayer());
+                    QMessageBox::information(this, "Blocked", "The action was blocked!");
+                    return; // Don't play the action
+                } catch (const std::exception& e) {
+                    QMessageBox::warning(this, "Block Failed", e.what());
+                }
+            }
+        }
+
+        // If not blocked, continue with the action
         game.playTurn(*action, targetIndex);
         updateGameView();
 

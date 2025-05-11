@@ -7,6 +7,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QGroupBox>
+#include <QStackedLayout>
 #include <vector>
 #include "Game.hpp"
 
@@ -32,6 +33,12 @@ private:
     QGroupBox* actionGroup;
     std::vector<QPushButton*> actionButtons;
     QPushButton* spyButton;
+    QWidget* addPlayerScreen;
+    QWidget* gameScreen;
+    QStackedLayout* stackedLayout;
+
+    QLineEdit* nameInput;
+    QLabel* errorLabel;
 };
 
 #endif // GUI_HPP
