@@ -2,6 +2,7 @@
 #include <memory>
 #include <string>
 #include <stdexcept>
+#include <iostream>
 
 bool Action::isType(const std::string& type) const {
     switch (action) {
@@ -39,6 +40,12 @@ void Action::playcard(Player& currplayer) const{
             currplayer.removecoin(3);
             break;
         case ActionType::Tax:
+            std::cout << "[DEBUG] Entering TaxAction::playcard for " << currplayer.getnameplayer() << "\n";
+            if (currplayer.getrole()) {
+            std::cout << "[DEBUG] Role name: " << currplayer.getrole()->getrolename() << "\n";
+            } else {
+                std::cout << "[DEBUG] Role is null!\n";
+            }
             currplayer.addcoin(2);
             break;
         default:

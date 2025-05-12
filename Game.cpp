@@ -1,4 +1,4 @@
-// Game.cpp - Improved
+// Game.cpp
 #include "Game.hpp"
 #include "Player.hpp"
 #include "PlayerManager.hpp"
@@ -51,10 +51,11 @@ void Game::playTurn(const Action& action, int targetIndex) {
     }
     
     Player& currentPlayer = *playerManager.players[currentPlayerIndex];
+    std::cout << "[DEBUG] Arrest block check: " << currentPlayer.getnameplayer()
+          << ", blocked? " << isarrestblocked(currentPlayer) << "\n";
     if (action.isType("Arrest")) {
         std::string currentName = currentPlayer.getnameplayer();
         if (isarrestblocked(currentPlayer)) {
-            clearArrestBlock(currentPlayer); // Only block once
             throw std::runtime_error("You are blocked from using Arrest this turn (Spy effect).");
         }
     }
@@ -68,10 +69,10 @@ void Game::playTurn(const Action& action, int targetIndex) {
     
     if (playerManager.isplayerindexvalid(targetIndex)) {
         targetPlayer = playerManager.players[targetIndex].get();
+        std::cout << "[DEBUG] Playing action: " << action.getactionname() << "\n";
         action.playcard(currentPlayer, *targetPlayer);
         
         if (targetPlayer) {
-            action.playcard(currentPlayer, *targetPlayer);
             if (action.isType("Coup")) {
                 playerManager.eliminateplayer(targetIndex);
             }
@@ -80,9 +81,12 @@ void Game::playTurn(const Action& action, int targetIndex) {
 
     } 
     else {
+        std::cout << "[DEBUG] Playing non-targeted action: " << action.getactionname() << "\n";
         action.playcard(currentPlayer);
     }
     
+    //clearArrestBlock(currentPlayer); // Clear the block after the action
+    clearArrestBlock();
     moveToNextPlayer();
     checkGameOver();
 }
@@ -197,6 +201,10 @@ int Game::getPlayerIndexByName(const std::string& name) {
     return -1;
 }
 Player* Game::getPlayerByIndex(int index) {
+    if (index < 0 ) {
+        std::cerr << "[ERROR] getPlayerByIndex: index out of bounds: " << index << "\n";
+        return nullptr;
+    }
     return playerManager.getPlayerByIndex(index);
 }
 

@@ -24,10 +24,13 @@ public:
     Game() : gameOver(false), currentPlayerIndex(0) {}
     std::unordered_set<std::string> arrestblocknext;
     void blockarrestfornext( Player& player) {
+        std::cout << "[DEBUG] Blocking arrest for player: " << player.getnameplayer() << std::endl;
+        std::cout << "[DEBUG] Address of player in blockarrest: " << &player << std::endl;
         arrestblocknext.insert(player.getnameplayer());
     }
-    void clearArrestBlock( Player& player) {
-        arrestblocknext.erase(player.getnameplayer());
+    void clearArrestBlock() {
+        arrestblocknext.erase(playerManager.players[currentPlayerIndex]->getnameplayer());
+
     }
     bool isarrestblocked( Player& player) {
         return arrestblocknext.count(player.getnameplayer()) > 0;

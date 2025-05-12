@@ -16,6 +16,7 @@
 
 
 GUI::GUI(Game& g, QWidget* parent) : QMainWindow(parent), game(g) {
+    resize(800, 1000);
     QWidget* central = new QWidget(this);
     setCentralWidget(central);
 
@@ -153,7 +154,7 @@ void GUI::handleAction(const QString& actionName) {
         ActionFactory factory;
         std::unique_ptr<Action> action = factory.createAction(actionName.toStdString());
         bool needsTarget = false;
-
+    
         if (action->isType("Arrest") || action->isType("Sanction") || action->isType("Coup")) {
             needsTarget = true;
         }
@@ -175,7 +176,10 @@ void GUI::handleAction(const QString& actionName) {
                 return;
             }
         }
-
+        if (needsTarget && targetIndex >= 0 && action->isType("Arrest") && game.isarrestblocked(*game.getCurrentPlayer())) {
+            QMessageBox::warning(this, "Blocked", "You are blocked from using Arrest this turn (Spy effect).");
+            return;
+        }
         if (needsTarget && targetIndex >= 0) {
             Player* targetPlayer = game.getPlayerByIndex(targetIndex);
             QString targetName = QString::fromStdString(targetPlayer->getnameplayer());
@@ -234,6 +238,7 @@ void GUI::handleSpyAction() {
     if (targetIndex >= 0) {
         Player* current = game.getCurrentPlayer();
         Player* target = game.getPlayerByIndex(targetIndex);
+        std::cout << "[DEBUG] targetIndex: " << targetIndex << ", name: " << target->getnameplayer() << ", address: " << target << std::endl;
         if (current && target && current->getrole()) {
             int others_coins = current->getrole()->rolespecialities(*current, game, target);
             QMessageBox::information(this, "Spy",
