@@ -71,6 +71,9 @@ void Action::playcard(Player& currplayer, Player& other)const {
             break;
         case ActionType::Sanction:
             currplayer.removecoin(3);
+            other.blockAction("Tax");
+            other.blockAction("Gather");
+            std::cout << "[DEBUG] " << other.getnameplayer() << " was sanctioned (Tax & Gather blocked)\n";
             break;
         case ActionType::Tax:
             currplayer.addcoin(2);

@@ -50,9 +50,12 @@ void Game::playTurn(const Action& action, int targetIndex) {
         return;
     }
     
+    
     Player& currentPlayer = *playerManager.players[currentPlayerIndex];
     std::cout << "[DEBUG] Arrest block check: " << currentPlayer.getnameplayer()
           << ", blocked? " << isarrestblocked(currentPlayer) << "\n";
+    currentPlayer.unblockAllActions();
+    std::cout << "[DEBUG] unblockAllActions() called for player " << currentPlayer.getnameplayer() << "\n";
     if (action.isType("Arrest")) {
         std::string currentName = currentPlayer.getnameplayer();
         if (isarrestblocked(currentPlayer)) {
@@ -75,6 +78,9 @@ void Game::playTurn(const Action& action, int targetIndex) {
         if (targetPlayer) {
             if (action.isType("Coup")) {
                 playerManager.eliminateplayer(targetIndex);
+                if (targetIndex < currentPlayerIndex) {
+                    currentPlayerIndex--;
+                }
             }
 
         }
@@ -87,8 +93,9 @@ void Game::playTurn(const Action& action, int targetIndex) {
     
     //clearArrestBlock(currentPlayer); // Clear the block after the action
     clearArrestBlock();
-    moveToNextPlayer();
-    checkGameOver();
+    if (!checkGameOver()) {
+        moveToNextPlayer();
+    }
 }
 
 void Game::moveToNextPlayer() {
@@ -104,6 +111,11 @@ void Game::moveToNextPlayer() {
     } while (!playerManager.players[nextIndex]);
     
     currentPlayerIndex = nextIndex;
+    // if (playerManager.players[currentPlayerIndex]) {
+    //     playerManager.players[currentPlayerIndex]->unblockAllActions();
+    //     std::cout << "[DEBUG] unblockAllActions() called for player " 
+    //               << playerManager.players[currentPlayerIndex]->getnameplayer() << "\n";
+    // }
 }
 
 bool Game::checkGameOver() {

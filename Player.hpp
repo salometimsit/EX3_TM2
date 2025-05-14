@@ -7,12 +7,16 @@
 using std::string;
 #include "Roles/RoleFactory.hpp"
 #include <random>
+#include <ostream>
+#include <iostream>
+#include <unordered_set>
 using std::unique_ptr;
 class Player{
     private: 
         std::string name;
         int coins;
         std::unique_ptr<Role> role;
+        std::unordered_set<std::string> blockedactions;
     public:
     
         std::unique_ptr<Role> assignroles(){
@@ -40,6 +44,18 @@ class Player{
         }
         Player(const std::string& name):name(name), coins(0), role(assignroles()){}
         ~Player()=default;
+        void blockAction(const std::string& actionName) {
+            blockedactions.insert(actionName);
+        }
+
+        void unblockAllActions() {
+            blockedactions.clear();
+        }
+        bool isActionBlocked(const std::string& actionName) const {
+            std::cout << "[DEBUG] Checking if blocked: " << actionName << " → " 
+              << (blockedactions.find(actionName) != blockedactions.end() ? "YES" : "NO") << std::endl;
+            return blockedactions.find(actionName) != blockedactions.end();
+        }
         std::string getnameplayer(){return name;}
         int getcoins(){return coins;}
         const Role* getrole(){return role.get();}

@@ -180,6 +180,12 @@ void GUI::handleAction(const QString& actionName) {
             QMessageBox::warning(this, "Blocked", "You are blocked from using Arrest this turn (Spy effect).");
             return;
         }
+        Player* current = game.getCurrentPlayer();
+        if (current && current->isActionBlocked(actionName.toStdString())) {
+            QMessageBox::warning(this, "Blocked", 
+                "You are blocked from performing this action (" + actionName + ") this turn.");
+            return;
+        }
         if (needsTarget && targetIndex >= 0) {
             Player* targetPlayer = game.getPlayerByIndex(targetIndex);
             QString targetName = QString::fromStdString(targetPlayer->getnameplayer());
