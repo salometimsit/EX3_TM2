@@ -23,10 +23,9 @@ class Role {
     public:
         Role(Type type); // Constructor  
         Type getType() const { return type_; }
-        void roleonaction(Player& currplayer,Action actionname,Player* other = nullptr)const;
         int rolespecialities(Player& currplayer,Game& game,Player* other=nullptr)const;
-      
-        void roledefence(Player& currplayer,Action action,Player& other)const; 
+        void roleonaction(Player& currplayer, const Action& actionname, Player* other = nullptr) const;
+        void roledefence(Player& currplayer, const Action& action, Player& other) const;
         std::string getrolename() const; 
         bool canblock(const Action& action) const;
 };

@@ -1,28 +1,17 @@
 #ifndef ACTION_HPP
 #define ACTION_HPP
+
 #include <string>
-#include "Player.hpp"
+class Player;
+class Game;
+
 class Action {
 public:
-    enum class ActionType {
-        Arrest,
-        Bribe,
-        Coup,
-        Gather,
-        Sanction,
-        Tax
-    };
-
-private:
-    ActionType action;
-
-public:
-    Action(ActionType actionType) : action(actionType) {}
-    ~Action() = default;
-    void playcard(Player& currplayer)const;
-    void playcard(Player& currplayer, Player& other)const;
-    std::string getactionname() const ;
-    bool isType(const std::string& type) const;
+    virtual void playcard(Player& currplayer) const = 0;
+    virtual void playcard(Player& currplayer, Player& other) const = 0;
+    virtual std::string getactionname() const = 0;
+    virtual bool isType(const std::string& type) const = 0;
+    virtual ~Action() = default;
 };
 
 #endif

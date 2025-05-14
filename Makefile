@@ -9,14 +9,13 @@ SRC = main.cpp \
       PlayerManager.cpp \
       Roles/Role.cpp \
       Roles/RoleFactory.cpp \
-      Actions/Action.cpp \
-      Actions/ActionFactory.cpp
+      Actions/ActionFactory.cpp \
+      Actions/AllAction.cpp   # ← ✅ Add this line
 
 OBJ = $(SRC:.cpp=.o)
 TARGET = coup_game
 
 all: $(TARGET)
-
 
 # Automatically generate moc_GUI.cpp before compiling GUI.o
 moc_GUI.cpp: GUI.hpp

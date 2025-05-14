@@ -17,7 +17,7 @@ string Role::getrolename() const{
     }
 
 }
-void Role::roleonaction(Player& currplayer,Action actionname,Player* other)const{
+void Role::roleonaction(Player& currplayer, const Action& actionname, Player* other) const {
     if (type_ == Type::Spy && other != nullptr) {
         std::cout << "player: " << other->getnameplayer() << ", coins: " << other->getcoins() << std::endl;
     }
@@ -80,7 +80,7 @@ int Role::rolespecialities(Player& currplayer,Game& game, Player* other)const{
             return 0;
     }
 }
-void Role:: roledefence(Player& currplayer,Action action,Player& other)const{
+void Role::roledefence(Player& currplayer, const Action& action, Player& other) const {
     if(action.isType("Arrest")){
         other.addcoin(1);
     }
