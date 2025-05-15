@@ -1,10 +1,6 @@
 #include "AllAction.hpp"
-
 #include "Player.hpp"
-
 #include <iostream>
-
-
 
 std::string Arrest::getactionname() const {
     return "Arrest";
@@ -19,8 +15,12 @@ void Arrest::playcard(Player& currplayer) const {
 }
 
 void Arrest::playcard(Player& currplayer, Player& other) const {
-    currplayer.addcoin(1);
-other.removecoin(1);
+    if (other.getrole() && other.getrole()->getrolename() == "Merchant") {
+        other.removecoin(2); // Merchant loses 2
+    } else {
+        currplayer.addcoin(1);
+        other.removecoin(1);
+    }
 }
 
 std::string Bribe::getactionname() const {
@@ -85,9 +85,9 @@ void Sanction::playcard(Player& currplayer) const {
 
 void Sanction::playcard(Player& currplayer, Player& other) const {
     currplayer.removecoin(3);
-other.blockAction("Tax");
-other.blockAction("Gather");
-std::cout << "[DEBUG] " << other.getnameplayer() << " was sanctioned (Tax & Gather blocked)\n";
+    other.blockAction("Tax");
+    other.blockAction("Gather");
+    std::cout << "[DEBUG] " << other.getnameplayer() << " was sanctioned (Tax & Gather blocked)\n";
 }
 
 std::string Tax::getactionname() const {
@@ -99,15 +99,38 @@ bool Tax::isType(const std::string& type) const {
 }
 
 void Tax::playcard(Player& currplayer) const {
-    std::cout << "[DEBUG] Entering Tax::playcard for " << currplayer.getnameplayer() << "\n";
-if (currplayer.getrole()) {
-    std::cout << "[DEBUG] Role name: " << currplayer.getrole()->getrolename() << "\n";
-} else {
-    std::cout << "[DEBUG] Role is null!\n";
-}
-currplayer.addcoin(2);
+    currplayer.addcoin(2);
 }
 
 void Tax::playcard(Player& currplayer, Player& other) const {
     currplayer.addcoin(2);
+}
+void Baroninvest::playcard(Player& currplayer) const {
+    currplayer.removecoin(3);
+    currplayer.addcoin(6);
+}
+void Baroninvest::playcard(Player& currplayer, Player& other) const {
+}
+bool Baroninvest::isType(const std::string& type) const {
+    return type == "Baroninvest";
+}
+bool Baroninvest::isspecial(const std::string& roleName) const{
+    if(roleName == "Baron") {
+        return true;
+    }
+    return false;
+}
+void Governorblocktax::playcard(Player& currplayer) const {
+}
+void Governorblocktax::playcard(Player& currplayer, Player& other) const {
+    other.blockAction("Tax");
+}
+bool Governorblocktax::isType(const std::string& type) const {
+    return type == "Governorblocktax";
+}
+bool Governorblocktax::isspecial(const std::string& roleName) const{
+    if(roleName == "Governor") {
+        return true;
+    }
+    return false;
 }

@@ -15,7 +15,11 @@ std::unique_ptr<Action> ActionFactory::createAction(const std::string& actionNam
         return std::make_unique<Arrest>();
     } else if (actionName == "Sanction") {
         return std::make_unique<Sanction>();
-    } else {
+    } else if (actionName == "Baroninvest") {
+        return std::make_unique<Baroninvest>();
+    } else if(actionName=="Governorblocktax"){
+        return std::make_unique<Governorblocktax>();
+    }else {
         throw std::invalid_argument("Invalid action name");
     }
 }

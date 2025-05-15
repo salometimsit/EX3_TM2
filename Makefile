@@ -6,11 +6,13 @@ SRC = main.cpp \
       GUI.cpp \
       moc_GUI.cpp \
       Game.cpp \
+      Player.cpp\
       PlayerManager.cpp \
       Roles/Role.cpp \
       Roles/RoleFactory.cpp \
       Actions/ActionFactory.cpp \
-      Actions/AllAction.cpp   # ← ✅ Add this line
+      Actions/AllAction.cpp\
+      Roles/AllRole.cpp    # ← ✅ Add this line
 
 OBJ = $(SRC:.cpp=.o)
 TARGET = coup_game

@@ -94,15 +94,21 @@ GUI::GUI(Game& g, QWidget* parent) : QMainWindow(parent), game(g) {
 
     spyButton = new QPushButton("Spy on Player");
     BaronButton = new QPushButton("Barons investment");
+    GovernorButton = new QPushButton("Governor Tax Block");
     BaronButton->setStyleSheet("font-size: 18px; padding: 6px; color: #D4AF37; background-color: rgba(0,0,0,0.6); border: 1px solid #D4AF37;");
     spyButton->setStyleSheet("font-size: 18px; padding: 6px; color: #D4AF37; background-color: rgba(0,0,0,0.6); border: 1px solid #D4AF37;");
+    GovernorButton->setStyleSheet("font-size: 18px; padding: 6px; color: #D4AF37; background-color: rgba(0,0,0,0.6); border: 1px solid #D4AF37;");
+
     actionLayout->addWidget(spyButton);
     actionLayout->addWidget(BaronButton);
+    actionLayout->addWidget(GovernorButton);
     spyButton->hide();
     BaronButton->hide();
+    GovernorButton->hide();
 
     connect(spyButton, &QPushButton::clicked, this, &GUI::handleSpyAction);
     connect(BaronButton, &QPushButton::clicked, this, &GUI::handleBaronAction);
+    connect(GovernorButton, &QPushButton::clicked, this, &GUI::handleGovernorAction);
 
     actionGroup->setLayout(actionLayout);
     actionGroup->setVisible(false);
@@ -160,7 +166,7 @@ void GUI::handleAction(const QString& actionName) {
         }
 
         int targetIndex = -1;
-
+        
         if (needsTarget) {
             bool ok;
             QStringList items;
@@ -181,7 +187,11 @@ void GUI::handleAction(const QString& actionName) {
             return;
         }
         Player* current = game.getCurrentPlayer();
-        if (current && current->isActionBlocked(actionName.toStdString())) {
+        if (!current) {
+            QMessageBox::critical(this, "Fatal", "Current player is null. Game state invalid.");
+            return;
+        }
+        if (current->isActionBlocked(actionName.toStdString())) {
             QMessageBox::warning(this, "Blocked", 
                 "You are blocked from performing this action (" + actionName + ") this turn.");
             return;
@@ -211,13 +221,24 @@ void GUI::handleAction(const QString& actionName) {
             }
 
             // If not blocked, continue with the action
+            if (action->isType("Coup") && checkGeneralBlock(targetIndex, *action)) {
+                return;  // Coup was blocked, don't proceed
+            }
             game.playTurn(*action, targetIndex);
-            updateGameView();
+            // if (action->isType("Bribe")) {
+            //     QMessageBox::information(this, "Bribe", "You gained an extra turn!");
+            // }
+            // updateGameView();
         }
 
         // Handle actions that don't require a target
         if (!needsTarget) {
             game.playTurn(*action, -1);
+
+            if (action->isType("Bribe")) {
+                QMessageBox::information(this, "Bribe", "You gained 2 extra turns!");
+            }
+
             updateGameView();
         }
 
@@ -225,8 +246,45 @@ void GUI::handleAction(const QString& actionName) {
         QMessageBox::warning(this, "Action Error", e.what());
     }
 }
+bool GUI::checkGeneralBlock(int targetIndex, const Action& action) {
+    Player* targetPlayer = game.getPlayerByIndex(targetIndex);
+    if (!targetPlayer) return false;
 
+    QString targetName = QString::fromStdString(targetPlayer->getnameplayer());
 
+    for (const auto& playerStr : game.playersList()) {
+        QString name = QString::fromStdString(playerStr);
+
+        // Skip current player and the target
+        if (name == QString::fromStdString(game.turn()) || name == targetName)
+            continue;
+
+        int index = game.getPlayerIndexByName(name.toStdString());
+        Player* potentialProtector = game.getPlayerByIndex(index);
+        if (potentialProtector && potentialProtector->getrole() &&
+            potentialProtector->getrole()->getrolename() == "General" &&
+            potentialProtector->getrole()->canblock(action)) {
+
+            QMessageBox::StandardButton reply = QMessageBox::question(this, "General Block",
+                name + ": Do you want to protect " + targetName + " and block the Coup?",
+                QMessageBox::Yes | QMessageBox::No);
+
+            if (reply == QMessageBox::Yes) {
+                try {
+                    game.blockaction(*potentialProtector, action, *game.getCurrentPlayer());
+                    QMessageBox::information(this, "Blocked", "The Coup was blocked by General!");
+                    updateGameView();
+                    return true;
+                } catch (const std::exception& e) {
+                    QMessageBox::warning(this, "Block Failed", e.what());
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
 
 
 
@@ -256,26 +314,49 @@ void GUI::handleSpyAction() {
         updateGameView();
     }
 }
-void  GUI::handleBaronAction(){
+void GUI::handleBaronAction() {
     Player* current = game.getCurrentPlayer();
-    if (current->getcoins() < 3) {
+    if (!current || current->getcoins() < 3) {
         QMessageBox::warning(this, "Insufficient Coins", "You need at least 3 coins to use Baron's ability.");
         return;
     }
+
+    if (current && current->getrole()) {
+        std::unique_ptr<SpecialAction> special = current->getrole()->getspecial(game, *current);
+        if (special) {
+            game.playTurn(*special); // No target for Baroninvest
+            QMessageBox::information(this, "Baron", "You invested 3 coins and gained 6!");
+        } else {
+            QMessageBox::warning(this, "Baron", "No special action available.");
+        }
+    }
+
+    updateGameView();
+}
+void GUI::handleGovernorAction() {
     bool ok;
     QStringList items;
     for (const auto& name : game.playersList()) {
         if (name != game.turn())
             items << QString::fromStdString(name);
     }
-    QString selected = QInputDialog::getItem(this, "Baron", "Invest 3 coins get 6:", items, 0, false, &ok);
+    QString selected = QInputDialog::getItem(this, "Governor", "Block Tax from player:", items, 0, false, &ok);
     if (!ok) return;
-    if (current && current->getrole()) {
-        current->getrole()->rolespecialities(*current,game);
-    }
-    updateGameView();
-}
 
+    int targetIndex = game.getPlayerIndexByName(selected.toStdString());
+    if (targetIndex >= 0) {
+        Player* current = game.getCurrentPlayer();
+        Player* target = game.getPlayerByIndex(targetIndex);
+        if (current && target && current->getrole()) {
+            std::unique_ptr<SpecialAction> special = current->getrole()->getspecial(game, *current, target);
+            if (special) {
+                game.playTurn(*special, targetIndex);
+                QMessageBox::information(this, "Governor", selected + " is now blocked from Tax this turn.");
+            }
+        }
+        updateGameView();
+    }
+}
 
 void GUI::updateGameView() {
     std::string current = game.turn();
@@ -289,5 +370,6 @@ void GUI::updateGameView() {
 
         spyButton->setVisible(role == "Spy");
         BaronButton->setVisible(role == "Baron");
+        GovernorButton->setVisible(role == "Governor");
     }
 }

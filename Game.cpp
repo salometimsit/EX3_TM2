@@ -36,7 +36,7 @@ void Game::startGame() {
     }
     if (playerManager.isplayervalid()) {
         cout << "Game started with " << playerManager.players.size() << " players." << endl;
-        playerManager.shuffleplayers();
+      
         currentPlayerIndex = 0;
         gameOver = false;
     } else {
@@ -50,7 +50,10 @@ void Game::playTurn(const Action& action, int targetIndex) {
         return;
     }
     
-    
+    if (currentPlayerIndex < 0 || currentPlayerIndex >= playerManager.players.size() || !playerManager.players[currentPlayerIndex]) {
+        std::cerr << "[ERROR] Invalid currentPlayerIndex: " << currentPlayerIndex << "\n";
+        return;
+    }
     Player& currentPlayer = *playerManager.players[currentPlayerIndex];
     std::cout << "[DEBUG] Arrest block check: " << currentPlayer.getnameplayer()
           << ", blocked? " << isarrestblocked(currentPlayer) << "\n";
@@ -71,30 +74,62 @@ void Game::playTurn(const Action& action, int targetIndex) {
     
     
     if (playerManager.isplayerindexvalid(targetIndex)) {
+        
         targetPlayer = playerManager.players[targetIndex].get();
         std::cout << "[DEBUG] Playing action: " << action.getactionname() << "\n";
+        if (targetPlayer&& action.isType("Sanction")) {
+            Player* target = playerManager.players[targetIndex].get();
+            if (target && target->getrole() && target->getrole()->getrolename() == "Judge") {
+                if (currentPlayer.getcoins() < 4) {
+                    throw std::runtime_error("You need at least 4 coins to sanction a Judge.");
+                }
+            }
+        }
         action.playcard(currentPlayer, *targetPlayer);
-        
-        if (targetPlayer) {
-            if (action.isType("Coup")) {
+        if (currentPlayer.getrole()) {
+            currentPlayer.getrole()->roleonaction(currentPlayer, action, targetPlayer);  // 🔁 MISSING RIGHT NOW
+        }
+        if (targetPlayer && targetPlayer->getrole()) {
+            std::cout << "[DEBUG] Target role: " << targetPlayer->getrole()->getrolename() << "\n";
+            targetPlayer->getrole()->roledefence(*targetPlayer, action, currentPlayer);
+        }
+        if (targetPlayer&&action.isType("Coup")) {
+            
                 playerManager.eliminateplayer(targetIndex);
                 if (targetIndex < currentPlayerIndex) {
                     currentPlayerIndex--;
                 }
-            }
-
+                std::cout << "[DEBUG] Target role: ";
+                if (currentPlayerIndex >= playerManager.players.size()) {
+                    currentPlayerIndex = 0;
+                }
+    
         }
+        
 
     } 
     else {
         std::cout << "[DEBUG] Playing non-targeted action: " << action.getactionname() << "\n";
         action.playcard(currentPlayer);
+        if (currentPlayer.getrole()) {
+            currentPlayer.getrole()->roleonaction(currentPlayer, action, targetPlayer);
+        }
+       
     }
-    
+    if (action.isType("Bribe")) {
+        bribebonus = 2;  // Give two extra turns
+    }
+
     //clearArrestBlock(currentPlayer); // Clear the block after the action
     clearArrestBlock();
     if (!checkGameOver()) {
-        moveToNextPlayer();
+        if (bribebonus > 0) {
+            std::cout << "[DEBUG] Bribe bonus turn, remaining: " << bribebonus << "\n";
+            bribebonus--;  // one used
+            return;        // stay on same player
+        } else {
+            moveToNextPlayer();
+        }
     }
 }
 

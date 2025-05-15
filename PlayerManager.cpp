@@ -3,6 +3,7 @@
 #include <memory>
 #include <stdexcept>
 #include "PlayerManager.hpp"
+#include "Player.hpp"
 #include <random>
 #include <algorithm>
 
@@ -32,11 +33,6 @@ bool PlayerManager::isplayerindexvalid(int index)const {
     return true;
 }
 
-void PlayerManager::shuffleplayers() {
-    std::random_device rd;
-    std::mt19937 g(rd());
-    std::shuffle(players.begin(), players.end(), g);
-}
 
 void PlayerManager::eliminateplayer(int index) {
     if (index < 0 || static_cast<size_t>(index) >= players.size()) {

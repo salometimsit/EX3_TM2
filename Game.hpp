@@ -1,7 +1,7 @@
 // Game.hpp - Improved
 #ifndef GAME_HPP
 #define GAME_HPP
-
+#pragma once
 #include <unordered_set>
 #include "Roles/RoleFactory.hpp"
 #include "Player.hpp"
@@ -16,11 +16,12 @@
 
 class Game {
 private:
-    PlayerManager playerManager;
     int currentPlayerIndex;
+    bool gameOver;
+    PlayerManager playerManager;
+    int bribebonus = 0; 
     
 public:
-    bool gameOver;
     Game() : gameOver(false), currentPlayerIndex(0) {}
     std::unordered_set<std::string> arrestblocknext;
     void blockarrestfornext( Player& player) {
@@ -29,7 +30,9 @@ public:
         arrestblocknext.insert(player.getnameplayer());
     }
     void clearArrestBlock() {
-        arrestblocknext.erase(playerManager.players[currentPlayerIndex]->getnameplayer());
+        if (currentPlayerIndex >= 0 && currentPlayerIndex < playerManager.players.size() && playerManager.players[currentPlayerIndex]) {
+            arrestblocknext.erase(playerManager.players[currentPlayerIndex]->getnameplayer());
+        }
 
     }
     bool isarrestblocked( Player& player) {
