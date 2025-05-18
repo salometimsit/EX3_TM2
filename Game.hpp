@@ -22,7 +22,7 @@ private:
     int bribebonus = 0; 
     
 public:
-    Game() : gameOver(false), currentPlayerIndex(0) {}
+    Game() : gameOver(false), currentPlayerIndex(0),bribebonus(0) {}
     std::unordered_set<std::string> arrestblocknext;
     void blockarrestfornext( Player& player) {
         std::cout << "[DEBUG] Blocking arrest for player: " << player.getnameplayer() << std::endl;

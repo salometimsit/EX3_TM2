@@ -1,0 +1,8 @@
+[2025-05-18 23:47:42] GUI constructor started
+[2025-05-18 23:47:42] AddPlayer screen loaded
+[2025-05-18 23:47:54] [Before] Tax by 1 (Coins: 0)
+[2025-05-18 23:47:54] [After] Tax by 1 (Coins: 2)
+[2025-05-18 23:47:54] [Before] Tax by 2 (Coins: 0)
+[2025-05-18 23:47:54] [After] Tax by 2 (Coins: 2)
+[2025-05-18 23:47:55] [Before] Tax by 33 (Coins: 0)
+[2025-05-18 23:47:55] [After] Tax by 33 (Coins: 2)

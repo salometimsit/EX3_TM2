@@ -1,11 +1,26 @@
+// #include "GUI.hpp"
+// #include <QInputDialog>
+// #include <QMessageBox>
+// #include <QGroupBox>
+// #include <QVBoxLayout>
+// #include <QHBoxLayout>
+// #include <QDebug>
+// #include <QFile>
+// #include <QPixmap>
+// #include <QPushButton>
+// #include <QLabel>
+// #include <QListWidget>
+// #include <QLineEdit>
+// #include <QApplication>
+// #include "Actions/ActionFactory.hpp"
 #include "GUI.hpp"
 #include <QInputDialog>
+#include <fstream>
 #include <QMessageBox>
 #include <QGroupBox>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QDebug>
-#include <QFile>
 #include <QPixmap>
 #include <QPushButton>
 #include <QLabel>
@@ -13,10 +28,124 @@
 #include <QLineEdit>
 #include <QApplication>
 #include "Actions/ActionFactory.hpp"
+std::ofstream logFile("coup_log.txt");
 
+void logEvent(const std::string& message) {
+    std::time_t now = std::time(nullptr);
+    char buf[64];
+    std::strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", std::localtime(&now));
+    logFile << "[" << buf << "] " << message << std::endl;
+}
+
+
+// GUI::GUI(Game& g, QWidget* parent) : QMainWindow(parent), game(g) {
+//     resize(800, 1000);
+//     QWidget* central = new QWidget(this);
+//     setCentralWidget(central);
+
+//     stackedLayout = new QStackedLayout();
+//     central->setLayout(stackedLayout);
+
+//     // === Add Player Screen ===
+//     addPlayerScreen = new QWidget();
+//     addPlayerScreen->setObjectName("AddPlayerScreen");
+    
+//     QPixmap addBg("/home/salome/projects/EX3/images/player_background.jpg");
+//     addBg = addBg.scaled(600, 800, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation); // or your fixed size
+
+//     QPalette addPalette;
+//     addPalette.setBrush(QPalette::Window, addBg);
+//     addPlayerScreen->setAutoFillBackground(true);
+//     addPlayerScreen->setPalette(addPalette);
+//     QVBoxLayout* addLayout = new QVBoxLayout(addPlayerScreen);
+//     addLayout->setContentsMargins(150, 300, 150, 100);
+
+//     nameInput = new QLineEdit();
+//     nameInput->setPlaceholderText("Enter player name");
+//     addLayout->addWidget(nameInput);
+
+//     QPushButton* addBtn = new QPushButton("ADD");
+//     QPushButton* startBtn = new QPushButton("START");
+//     errorLabel = new QLabel();
+//     errorLabel->setStyleSheet("color: red; font-size: 16px");
+
+//     addLayout->addWidget(addBtn);
+//     addLayout->addWidget(startBtn);
+//     addLayout->addWidget(errorLabel);
+
+//     connect(addBtn, &QPushButton::clicked, this, &GUI::addPlayer);
+//     connect(startBtn, &QPushButton::clicked, this, &GUI::startGame);
+    
+
+//     // === Main Game Screen ===
+//     gameScreen = new QWidget(this);  // Ensure parent is set
+//     addPlayerScreen->setObjectName("AddPlayerScreen");
+//     gameScreen->setObjectName("GameScreen");
+
+//     QPixmap gameBg("/home/salome/projects/EX3/images/main_background.jpg");
+//     gameBg = gameBg.scaled(600, 800, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+//     QPalette gamePalette;
+//     gamePalette.setBrush(QPalette::Window, gameBg);
+
+//     gameScreen->setAutoFillBackground(true);
+//     gameScreen->setPalette(gamePalette);
+
+//     QVBoxLayout* mainLayout = new QVBoxLayout(gameScreen);
+//     mainLayout->setContentsMargins(20, 20, 20, 20);  // Optional spacing from edge
+
+//     statusLabel = new QLabel("Welcome to Coup");
+//     statusLabel->setStyleSheet("color: #F9E79F; font-size: 20px; font-weight: bold;"); // Optional style
+//     mainLayout->addWidget(statusLabel);
+
+//     playerList = new QListWidget();
+//     mainLayout->addWidget(playerList);
+
+//     actionGroup = new QGroupBox("Actions");
+//     QVBoxLayout* actionLayout = new QVBoxLayout();
+
+//     QStringList actions = {"Gather", "Tax", "Bribe", "Arrest", "Sanction", "Coup"};
+//     for (const QString& act : actions) {
+//         QPushButton* btn = new QPushButton(act);
+//         btn->setStyleSheet("font-size: 18px; padding: 6px; color: #D4AF37; background-color: rgba(0,0,0,0.6); border: 1px solid #D4AF37;");
+//         actionButtons.push_back(btn);
+//         actionLayout->addWidget(btn);
+
+//         connect(btn, &QPushButton::clicked, this, [this, act]() {
+//             handleAction(act);
+//         });
+//     }
+
+//     spyButton = new QPushButton("Spy on Player");
+//     BaronButton = new QPushButton("Barons investment");
+//     GovernorButton = new QPushButton("Governor Tax Block");
+//     BaronButton->setStyleSheet("font-size: 18px; padding: 6px; color: #D4AF37; background-color: rgba(0,0,0,0.6); border: 1px solid #D4AF37;");
+//     spyButton->setStyleSheet("font-size: 18px; padding: 6px; color: #D4AF37; background-color: rgba(0,0,0,0.6); border: 1px solid #D4AF37;");
+//     GovernorButton->setStyleSheet("font-size: 18px; padding: 6px; color: #D4AF37; background-color: rgba(0,0,0,0.6); border: 1px solid #D4AF37;");
+
+//     actionLayout->addWidget(spyButton);
+//     actionLayout->addWidget(BaronButton);
+//     actionLayout->addWidget(GovernorButton);
+//     spyButton->hide();
+//     BaronButton->hide();
+//     GovernorButton->hide();
+
+//     connect(spyButton, &QPushButton::clicked, this, &GUI::handleSpyAction);
+//     connect(BaronButton, &QPushButton::clicked, this, &GUI::handleBaronAction);
+//     connect(GovernorButton, &QPushButton::clicked, this, &GUI::handleGovernorAction);
+
+//     actionGroup->setLayout(actionLayout);
+//     actionGroup->setVisible(false);
+//     mainLayout->addWidget(actionGroup);
+
+//     stackedLayout->addWidget(addPlayerScreen);
+//     stackedLayout->addWidget(gameScreen);
+//     stackedLayout->setCurrentWidget(addPlayerScreen);
+//     qDebug() << "GUI ready, showing AddPlayer screen";
+// }
 
 GUI::GUI(Game& g, QWidget* parent) : QMainWindow(parent), game(g) {
-    resize(800, 1000);
+    logEvent("GUI constructor started");
+    resize(900, 1000);
     QWidget* central = new QWidget(this);
     setCentralWidget(central);
 
@@ -26,67 +155,106 @@ GUI::GUI(Game& g, QWidget* parent) : QMainWindow(parent), game(g) {
     // === Add Player Screen ===
     addPlayerScreen = new QWidget();
     addPlayerScreen->setObjectName("AddPlayerScreen");
-    
-    QPixmap addBg("/home/salome/projects/EX3/images/player_background.jpg");
-    addBg = addBg.scaled(600, 800, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation); // or your fixed size
 
+    QPixmap addBg("/home/salome/projects/EX3/images/player_background.jpg");
+    
+    addBg = addBg.scaled(900, 1000, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
     QPalette addPalette;
     addPalette.setBrush(QPalette::Window, addBg);
     addPlayerScreen->setAutoFillBackground(true);
     addPlayerScreen->setPalette(addPalette);
+    //addPlayerScreen->setStyleSheet("QWidget { background: transparent; }");
+
+
     QVBoxLayout* addLayout = new QVBoxLayout(addPlayerScreen);
-    addLayout->setContentsMargins(150, 300, 150, 100);
+    addLayout->setContentsMargins(250, 600, 250, 200);
+    addLayout->setSpacing(15);
 
     nameInput = new QLineEdit();
     nameInput->setPlaceholderText("Enter player name");
+    nameInput->setStyleSheet("background: rgba(255, 255, 255, 0.7); padding: 8px; border-radius: 10px; font-size: 16px;");
     addLayout->addWidget(nameInput);
 
     QPushButton* addBtn = new QPushButton("ADD");
     QPushButton* startBtn = new QPushButton("START");
+
+    QString buttonStyle = "font-size: 18px; background-color: rgba(0,0,0,0.7); color: white; border: 1px solid white; border-radius: 10px; padding: 6px;";
+    addBtn->setStyleSheet(buttonStyle);
+    startBtn->setStyleSheet(buttonStyle);
+
     errorLabel = new QLabel();
-    errorLabel->setStyleSheet("color: red; font-size: 16px");
+    errorLabel->setStyleSheet("color: red; font-size: 16px; font-weight: bold;");
 
     addLayout->addWidget(addBtn);
     addLayout->addWidget(startBtn);
     addLayout->addWidget(errorLabel);
+    addLayout->setAlignment(Qt::AlignTop);
 
     connect(addBtn, &QPushButton::clicked, this, &GUI::addPlayer);
     connect(startBtn, &QPushButton::clicked, this, &GUI::startGame);
-    
 
-    // === Main Game Screen ===
-    gameScreen = new QWidget(this);  // Ensure parent is set
-    addPlayerScreen->setObjectName("AddPlayerScreen");
+    // === Game Screen ===
+    gameScreen = new QWidget(this);
     gameScreen->setObjectName("GameScreen");
 
     QPixmap gameBg("/home/salome/projects/EX3/images/main_background.jpg");
-    gameBg = gameBg.scaled(600, 800, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+    gameBg = gameBg.scaled(900, 1000, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
     QPalette gamePalette;
     gamePalette.setBrush(QPalette::Window, gameBg);
-
     gameScreen->setAutoFillBackground(true);
     gameScreen->setPalette(gamePalette);
 
     QVBoxLayout* mainLayout = new QVBoxLayout(gameScreen);
-    mainLayout->setContentsMargins(20, 20, 20, 20);  // Optional spacing from edge
+    mainLayout->setContentsMargins(30, 30, 30, 30);
+    mainLayout->setSpacing(15);
 
     statusLabel = new QLabel("Welcome to Coup");
-    statusLabel->setStyleSheet("color: #F9E79F; font-size: 20px; font-weight: bold;"); // Optional style
+    statusLabel->setStyleSheet("color: #F1C40F; font-size: 24px; font-weight: bold; background-color: rgba(0,0,0,0.4); padding: 10px; border-radius: 10px;");
     mainLayout->addWidget(statusLabel);
 
     playerList = new QListWidget();
+    playerList->setStyleSheet("background-color: rgba(255, 255, 255, 0.4); border: none; color: white; font-weight: bold; font-size: 16px; border-radius: 10px; padding: 5px;");
     mainLayout->addWidget(playerList);
 
     actionGroup = new QGroupBox("Actions");
+    actionGroup->setStyleSheet(R"(
+        QGroupBox {
+            background-color: rgba(0, 0, 0, 0.5);
+            border: 2px solid #D4AF37;
+            border-radius: 15px;
+            margin-top: 10px;
+        }
+        QGroupBox::title {
+            color: #D4AF37;
+            subcontrol-origin: margin;
+            padding-left: 10px;
+        }
+    )");
+
     QVBoxLayout* actionLayout = new QVBoxLayout();
 
     QStringList actions = {"Gather", "Tax", "Bribe", "Arrest", "Sanction", "Coup"};
+    QString actionBtnStyle = R"(
+        QPushButton {
+            font-size: 18px; padding: 6px;
+            color: #D4AF37;
+            background-color: rgba(0,0,0,0.6);
+            border: 1px solid #D4AF37;
+            border-radius: 10px;
+        }
+        QPushButton:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        QPushButton:pressed {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+    )";
+
     for (const QString& act : actions) {
         QPushButton* btn = new QPushButton(act);
-        btn->setStyleSheet("font-size: 18px; padding: 6px; color: #D4AF37; background-color: rgba(0,0,0,0.6); border: 1px solid #D4AF37;");
+        btn->setStyleSheet(actionBtnStyle);
         actionButtons.push_back(btn);
         actionLayout->addWidget(btn);
-
         connect(btn, &QPushButton::clicked, this, [this, act]() {
             handleAction(act);
         });
@@ -95,16 +263,11 @@ GUI::GUI(Game& g, QWidget* parent) : QMainWindow(parent), game(g) {
     spyButton = new QPushButton("Spy on Player");
     BaronButton = new QPushButton("Barons investment");
     GovernorButton = new QPushButton("Governor Tax Block");
-    BaronButton->setStyleSheet("font-size: 18px; padding: 6px; color: #D4AF37; background-color: rgba(0,0,0,0.6); border: 1px solid #D4AF37;");
-    spyButton->setStyleSheet("font-size: 18px; padding: 6px; color: #D4AF37; background-color: rgba(0,0,0,0.6); border: 1px solid #D4AF37;");
-    GovernorButton->setStyleSheet("font-size: 18px; padding: 6px; color: #D4AF37; background-color: rgba(0,0,0,0.6); border: 1px solid #D4AF37;");
-
-    actionLayout->addWidget(spyButton);
-    actionLayout->addWidget(BaronButton);
-    actionLayout->addWidget(GovernorButton);
-    spyButton->hide();
-    BaronButton->hide();
-    GovernorButton->hide();
+    for (auto* btn : {spyButton, BaronButton, GovernorButton}) {
+        btn->setStyleSheet(actionBtnStyle);
+        actionLayout->addWidget(btn);
+        btn->hide();
+    }
 
     connect(spyButton, &QPushButton::clicked, this, &GUI::handleSpyAction);
     connect(BaronButton, &QPushButton::clicked, this, &GUI::handleBaronAction);
@@ -117,8 +280,9 @@ GUI::GUI(Game& g, QWidget* parent) : QMainWindow(parent), game(g) {
     stackedLayout->addWidget(addPlayerScreen);
     stackedLayout->addWidget(gameScreen);
     stackedLayout->setCurrentWidget(addPlayerScreen);
-    qDebug() << "GUI ready, showing AddPlayer screen";
+    logEvent("AddPlayer screen loaded");
 }
+
 
 
 void GUI::addPlayer() {
@@ -224,16 +388,39 @@ void GUI::handleAction(const QString& actionName) {
             if (action->isType("Coup") && checkGeneralBlock(targetIndex, *action)) {
                 return;  // Coup was blocked, don't proceed
             }
+            if (action->isType("Arrest")) {
+                std::string targetName = targetPlayer->getnameplayer();
+                if (current->arrestCooldown.count(targetName) && current->arrestCooldown[targetName] > 0) {
+                    QMessageBox::warning(this, "Cooldown", 
+                        "You must wait before arresting this player again.");
+                    return;
+                }
+            }
+
+            logEvent("[Before] " + actionName.toStdString() +
+            " by " + current->getnameplayer() +
+            " (Coins: " + std::to_string(current->getcoins()) + ")");
             game.playTurn(*action, targetIndex);
-            // if (action->isType("Bribe")) {
-            //     QMessageBox::information(this, "Bribe", "You gained an extra turn!");
-            // }
-            // updateGameView();
+            logEvent("[After] " + actionName.toStdString() +
+                    " by " + current->getnameplayer() +
+                    " (Coins: " + std::to_string(current->getcoins()) + ")");
+            if (action->isType("Arrest") && targetIndex >= 0) {
+                Player* targetPlayer = game.getPlayerByIndex(targetIndex);
+                current->arrestCooldown[targetPlayer->getnameplayer()] = 2;
+            }
+
         }
 
         // Handle actions that don't require a target
         if (!needsTarget) {
+            logEvent("[Before] " + actionName.toStdString() +
+            " by " + current->getnameplayer() +
+            " (Coins: " + std::to_string(current->getcoins()) + ")");
             game.playTurn(*action, -1);
+            logEvent("[After] " + actionName.toStdString() +
+                    " by " + current->getnameplayer() +
+                    " (Coins: " + std::to_string(current->getcoins()) + ")");
+            
 
             if (action->isType("Bribe")) {
                 QMessageBox::information(this, "Bribe", "You gained 2 extra turns!");
@@ -241,6 +428,7 @@ void GUI::handleAction(const QString& actionName) {
 
             updateGameView();
         }
+        updateGameView();
 
     } catch (const std::exception& e) {
         QMessageBox::warning(this, "Action Error", e.what());
@@ -289,6 +477,7 @@ bool GUI::checkGeneralBlock(int targetIndex, const Action& action) {
 
 
 void GUI::handleSpyAction() {
+   
     bool ok;
     QStringList items;
     for (const auto& name : game.playersList()) {
@@ -296,6 +485,7 @@ void GUI::handleSpyAction() {
             items << QString::fromStdString(name);
     }
     QString selected = QInputDialog::getItem(this, "Spy", "Choose a player to spy on:", items, 0, false, &ok);
+    logEvent("Spy used on: " + selected.toStdString());
     if (!ok) return;
 
     int targetIndex = game.getPlayerIndexByName(selected.toStdString());
@@ -315,6 +505,7 @@ void GUI::handleSpyAction() {
     }
 }
 void GUI::handleBaronAction() {
+    logEvent("Baron action triggered");
     Player* current = game.getCurrentPlayer();
     if (!current || current->getcoins() < 3) {
         QMessageBox::warning(this, "Insufficient Coins", "You need at least 3 coins to use Baron's ability.");
@@ -373,3 +564,5 @@ void GUI::updateGameView() {
         GovernorButton->setVisible(role == "Governor");
     }
 }
+
+

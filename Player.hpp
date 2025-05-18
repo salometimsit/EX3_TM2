@@ -11,6 +11,7 @@ class RoleFactory;
 #include <ostream>
 #include <iostream>
 #include <unordered_set>
+#include <unordered_map>
 using std::unique_ptr;
 class Player{
     private: 
@@ -18,8 +19,9 @@ class Player{
         int coins;
         std::unique_ptr<Role> role;
         std::unordered_set<std::string> blockedactions;
+        
     public:
-    
+        std::unordered_map<std::string, int> arrestCooldown;
         std::unique_ptr<Role> assignroles();
         Player(const std::string& name):name(name), coins(0), role(assignroles()){}
         ~Player()=default;

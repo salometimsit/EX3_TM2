@@ -115,17 +115,14 @@ std::unique_ptr<SpecialAction> Judge::getspecial(Game& game, Player& user, Playe
 
 
 int Merchant::rolespecialities(Player& currplayer, Game& game, Player* other) const {
-    if (currplayer.getcoins() > 3) {
+    if (currplayer.getcoins() >= 3) {
         currplayer.addcoin(1);
-        std::cout << "[DEBUG] Merchant bonus applied\n";
+        return 1;
     }
     return 0;
 }
 
 void Merchant::roleonaction(Player& currplayer, const Action& actionname, Player* other) const {
-    if (currplayer.getcoins() > 3) {
-        currplayer.addcoin(1);
-    }
 }
 
 void Merchant::roledefence(Player& currplayer, const Action& action, Player& other) const {

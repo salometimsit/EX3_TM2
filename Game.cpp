@@ -54,7 +54,11 @@ void Game::playTurn(const Action& action, int targetIndex) {
         std::cerr << "[ERROR] Invalid currentPlayerIndex: " << currentPlayerIndex << "\n";
         return;
     }
+    
     Player& currentPlayer = *playerManager.players[currentPlayerIndex];
+    for (auto& [target, cooldown] : currentPlayer.arrestCooldown) {
+        if (cooldown > 0) --cooldown;
+    }
     std::cout << "[DEBUG] Arrest block check: " << currentPlayer.getnameplayer()
           << ", blocked? " << isarrestblocked(currentPlayer) << "\n";
     currentPlayer.unblockAllActions();
@@ -66,6 +70,9 @@ void Game::playTurn(const Action& action, int targetIndex) {
         }
     }
     Player* targetPlayer = nullptr;
+    if (currentPlayer.getrole()->getrolename() == "Merchant") {
+        currentPlayer.getrole()->rolespecialities(currentPlayer, *this);
+    }
     // Check if player has more than 10 coins and must play coup
     if (currentPlayer.getcoins() > 10 && !action.isType("Coup")) {
         throw std::runtime_error("You have more than 10 coins. You must play coup.");
