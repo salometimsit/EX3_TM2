@@ -22,7 +22,7 @@ public:
      * @return A unique_ptr to the created Action object.
      * @throws std::invalid_argument if the actionName does not match any known action types.
      */
-    static std::unique_ptr<Action> createAction(const std::string& actionName);
+    static Action* createAction(const std::string& actionName); 
 };
 
 #endif

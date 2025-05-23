@@ -7,12 +7,18 @@
 #include <random>
 #include <algorithm>
 
-bool PlayerManager::addPlayer(unique_ptr<Player> player) {
+
+PlayerManager::~PlayerManager() {
+    for (Player* p : players) {
+        delete p;
+    }
+}
+bool PlayerManager::addPlayer(Player* player) {
     if (players.size() >= MAX_PLAYERS) {
         throw std::runtime_error("Maximum number of players reached cannot add more players");
     }
-    players.push_back(move(player));
-    return true; 
+    players.push_back(player);
+    return true;
 }
 
 
@@ -46,7 +52,7 @@ size_t PlayerManager::playerCount() const {
 }
 Player* PlayerManager::getPlayerByIndex(int index) {
     if (index >= 0 && index < players.size() && players[index]) {
-        return players[index].get();
+        return players[index];
     }
     return nullptr;
 }

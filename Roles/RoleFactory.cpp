@@ -9,19 +9,19 @@
  * @return std::unique_ptr<Role> A unique pointer to the created Role object.
  * @throws std::invalid_argument If the role name does not match any known Role type.
  */
-std::unique_ptr<Role> RoleFactory::createRole(const std::string& roleName) {
+Role* RoleFactory::createRole(const std::string& roleName) {
     if (roleName == "Governor") {
-        return std::make_unique<Governor>();
+        return new Governor();
     } else if (roleName == "Spy") {
-        return std::make_unique<Spy>();
+        return new Spy();
     } else if (roleName == "Baron") {
-        return std::make_unique<Baron>();
+        return new Baron();
     } else if (roleName == "General") {
-        return std::make_unique<General>();
+        return new General();
     } else if (roleName == "Judge") {
-        return std::make_unique<Judge>();
+        return new Judge();
     } else if (roleName == "Merchant") {
-        return std::make_unique<Merchant>();
+        return new Merchant();
     } else {
         throw std::invalid_argument("Invalid role name");
     }

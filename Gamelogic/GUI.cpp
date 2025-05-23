@@ -291,6 +291,7 @@ void GUI::addPlayer() {
 
     try {
         game.addPlayer(name.toStdString());
+        logEvent("Player added: " + name.toStdString());
         nameInput->clear();
         errorLabel->setText("");
     } catch (const std::exception& e) {
@@ -302,13 +303,13 @@ void GUI::addPlayer() {
 void GUI::startGame() {
     try {
         game.startGame();
+        logEvent("Game started with " + std::to_string(game.playersList().size()) + " players");
 
         // Setup player list
         playerList->clear();
         for (const auto& name : game.playersList()) {
             playerList->addItem(QString::fromStdString(name));
         }
-
         updateGameView();
         actionGroup->setVisible(true);
         stackedLayout->setCurrentWidget(gameScreen);
@@ -322,7 +323,9 @@ void GUI::startGame() {
 void GUI::handleAction(const QString& actionName) {
     try {
         ActionFactory factory;
-        std::unique_ptr<Action> action = factory.createAction(actionName.toStdString());
+        //qDebug() << "Action passed to factory: " << actionName;
+        Action* action = factory.createAction(actionName.toStdString());
+        //qDebug() << "Action passed to after: " << action->getactionname().c_str();
         bool needsTarget = false;
     
         if (action->isType("Arrest") || action->isType("Sanction") || action->isType("Coup")) {
@@ -372,12 +375,15 @@ void GUI::handleAction(const QString& actionName) {
                     QMessageBox::Yes | QMessageBox::No);
 
                 if (reply == QMessageBox::Yes) {
+                    
                     try {
+                        logEvent("Action '" + actionName.toStdString() + "' was blocked by " + targetName.toStdString());
                         game.blockaction(*targetPlayer, *action, *game.getCurrentPlayer());
                         QMessageBox::information(this, "Blocked", "The action was blocked!");
                         updateGameView();
                         return;
                     } catch (const std::exception& e) {
+                        logEvent("Action '" + actionName.toStdString() + "failed to block");
                         QMessageBox::warning(this, "Block Failed", e.what());
                         return;
                     }
@@ -429,10 +435,17 @@ void GUI::handleAction(const QString& actionName) {
             updateGameView();
         }
         updateGameView();
+        delete action;
 
     } catch (const std::exception& e) {
+        Player* current = game.getCurrentPlayer();
+        std::string errorMessage = e.what();
+        logEvent("ACTION FAILED: " + actionName.toStdString() + " by " +
+                (current ? current->getnameplayer() : "Unknown") +
+                " — ERROR: " + errorMessage);
         QMessageBox::warning(this, "Action Error", e.what());
     }
+    
 }
 bool GUI::checkGeneralBlock(int targetIndex, const Action& action) {
     Player* targetPlayer = game.getPlayerByIndex(targetIndex);
@@ -554,6 +567,7 @@ void GUI::updateGameView() {
     if (current.empty()) {
         statusLabel->setText("Game Over! Winner: " + QString::fromStdString(game.winner()));
         actionGroup->setVisible(false);
+        logEvent("Game over. Winner: " + game.winner());
     } else {
         QString role = QString::fromStdString(game.getCurrentPlayerRole());
         int coins = game.getCurrentPlayerCoins();

@@ -18,23 +18,27 @@ class Player{
     private: 
         std::string name;
         int coins;
-        std::unique_ptr<Role> role;
+        // std::unique_ptr<Role> role;
+        Role* role;
         std::unordered_set<std::string> blockedactions;
         
     public:
         std::unordered_map<std::string, int> arrestCooldown;
-        std::unique_ptr<Role> assignroles();
-        Player(const std::string& name):name(name), coins(0), role(assignroles()){}
-        ~Player()=default;
+        Role* assignroles();
+        // Player(const std::string& name):name(name), coins(0), role(assignroles()){}
+        Player(const std::string& name);
+        Player(const Player& other);
+        Player& operator=(const Player& other);
+        ~Player();
         void blockAction(const std::string& actionName);
         void unblockAllActions();
         bool isActionBlocked(const std::string& actionName) const;
         std::string getnameplayer(){return name;}
         int getcoins(){return coins;}
-        const Role* getrole(){return role.get();}
+        const Role* getrole(){return role;}
         void setcoins(int c){coins=c;}
         void setname(const string& n){name=n;}
-        void setrole(unique_ptr<Role> r){role=std::move(r);}
+        void setrole(Role* r);
         void addcoin(int amount); 
         void removecoin(int amount){if(coins>=amount){coins-=amount;}else{throw::std::runtime_error("not enough coins");}}//return error if amount>valid 
         

@@ -1,14 +1,17 @@
-[2025-05-23 16:14:01] GUI constructor started
-[2025-05-23 16:14:01] AddPlayer screen loaded
-[2025-05-23 16:14:09] [Before] Tax by 1 (Coins: 0)
-[2025-05-23 16:14:09] [After] Tax by 1 (Coins: 3)
-[2025-05-23 16:14:09] [Before] Tax by 2 (Coins: 0)
-[2025-05-23 16:14:09] [After] Tax by 2 (Coins: 3)
-[2025-05-23 16:14:09] [Before] Gather by 3 (Coins: 0)
-[2025-05-23 16:14:09] [After] Gather by 3 (Coins: 1)
-[2025-05-23 16:14:09] [Before] Tax by 4 (Coins: 0)
-[2025-05-23 16:14:09] [After] Tax by 4 (Coins: 2)
-[2025-05-23 16:14:10] [Before] Gather by 1 (Coins: 3)
-[2025-05-23 16:14:10] [After] Gather by 1 (Coins: 4)
-[2025-05-23 16:14:10] [Before] Gather by 2 (Coins: 3)
-[2025-05-23 16:14:10] [After] Gather by 2 (Coins: 4)
+[2025-05-23 17:14:37] GUI constructor started
+[2025-05-23 17:14:37] AddPlayer screen loaded
+[2025-05-23 17:14:40] Player added: 1
+[2025-05-23 17:14:41] Player added: 2
+[2025-05-23 17:14:41] Game started with 2 players
+[2025-05-23 17:14:42] [Before] Tax by 1 (Coins: 0)
+[2025-05-23 17:14:42] [After] Tax by 1 (Coins: 2)
+[2025-05-23 17:14:43] [Before] Gather by 2 (Coins: 0)
+[2025-05-23 17:14:43] [After] Gather by 2 (Coins: 1)
+[2025-05-23 17:14:43] [Before] Tax by 1 (Coins: 2)
+[2025-05-23 17:14:43] [After] Tax by 1 (Coins: 4)
+[2025-05-23 17:14:43] [Before] Gather by 2 (Coins: 1)
+[2025-05-23 17:14:43] [After] Gather by 2 (Coins: 2)
+[2025-05-23 17:14:44] [Before] Tax by 1 (Coins: 4)
+[2025-05-23 17:14:44] [After] Tax by 1 (Coins: 6)
+[2025-05-23 17:14:44] [Before] Gather by 2 (Coins: 2)
+[2025-05-23 17:14:44] [After] Gather by 2 (Coins: 3)

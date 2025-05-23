@@ -44,7 +44,7 @@ bool Game::isarrestblocked( Player& player) {
 void Game::addPlayer(const string& name) {
     // Add a player if we haven't reached the max player count
     Player* player = new Player(name);
-    if (playerManager.addPlayer(std::unique_ptr<Player>(player))) {
+    if (playerManager.addPlayer(player)) {
         cout << "Player " << name << " added to the game." << endl;
     } else {
         throw std::runtime_error("Maximum number of players reached");
@@ -109,9 +109,9 @@ void Game::playTurn(const Action& action, int targetIndex) {
     
     if (playerManager.isplayerindexvalid(targetIndex)) {
         
-        targetPlayer = playerManager.players[targetIndex].get();
+        targetPlayer = playerManager.players[targetIndex];
         if (targetPlayer&& action.isType("Sanction")) {
-            Player* target = playerManager.players[targetIndex].get();
+            Player* target = playerManager.players[targetIndex];
             if (target && target->getrole() && target->getrole()->getrolename() == "Judge") {
                 if (currentPlayer.getcoins() < 4) {
                     throw std::runtime_error("You need at least 4 coins to sanction a Judge.");
@@ -262,7 +262,7 @@ Player* Game::getCurrentPlayer() {
     if (currentPlayerIndex >= 0 && 
         currentPlayerIndex < playerManager.players.size() && 
         playerManager.players[currentPlayerIndex]) {
-        return playerManager.players[currentPlayerIndex].get();
+        return playerManager.players[currentPlayerIndex];
     }
     return nullptr;
 }

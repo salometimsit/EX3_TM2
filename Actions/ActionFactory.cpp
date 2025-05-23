@@ -11,23 +11,23 @@
  * @return std::unique_ptr<Action> A unique pointer to the created Action object.
  * @throws std::invalid_argument If the action name does not correspond to a known Action type.
  */
-std::unique_ptr<Action> ActionFactory::createAction(const std::string& actionName) {
+Action* ActionFactory::createAction(const std::string& actionName)  {
     if (actionName == "Gather") {
-        return std::make_unique<Gather>();
+        return new Gather();
     } else if (actionName == "Tax") {
-        return std::make_unique<Tax>();
+        return new Tax();
     } else if (actionName == "Bribe") {
-        return std::make_unique<Bribe>();
+        return new Bribe();
     } else if (actionName == "Coup") {
-        return std::make_unique<Coup>();
+        return new Coup();
     } else if (actionName == "Arrest") {
-        return std::make_unique<Arrest>();
+        return new Arrest();
     } else if (actionName == "Sanction") {
-        return std::make_unique<Sanction>();
+        return new  Sanction();
     } else if (actionName == "Baroninvest") {
-        return std::make_unique<Baroninvest>();
+        return new Baroninvest();
     } else if(actionName=="Governorblocktax"){
-        return std::make_unique<Governorblocktax>();
+        return new Governorblocktax();
     }else {
         throw std::invalid_argument("Invalid action name");
     }

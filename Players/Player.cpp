@@ -3,7 +3,30 @@
 #include "Roles/RoleFactory.hpp"
 #include <random>
 
+Player::~Player() {
+    delete role;
+}
 
+Player::Player(const std::string& name) : name(name), coins(0) {
+    role = assignroles();
+}
+Player::Player(const Player& other): name(other.name), coins(other.coins), blockedactions(other.blockedactions), arrestCooldown(other.arrestCooldown) {
+    role = RoleFactory::createRole(other.role->getrolename());
+}
+Player& Player::operator=(const Player& other) {
+    if (this == &other) return *this;
+    name = other.name;
+    coins = other.coins;
+    blockedactions = other.blockedactions;
+    arrestCooldown = other.arrestCooldown;
+    delete role;
+    role = RoleFactory::createRole(other.role->getrolename());
+    return *this;
+}
+void Player::setrole(Role* r) {
+    delete role;  // clean up old one first
+    role = r;
+}
 void Player::blockAction(const std::string& actionName) {
     blockedactions.insert(actionName);
 }
@@ -21,7 +44,7 @@ void Player::addcoin(int amount){
     coins+=amount;
 }
 
-std::unique_ptr<Role> Player::assignroles(){
+Role* Player::assignroles(){
             std::random_device rd;
             std::mt19937 g(rd());
             std::uniform_int_distribution<int> dist(1,6);

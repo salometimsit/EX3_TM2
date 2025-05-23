@@ -14,10 +14,10 @@ struct PlayerManager{
     public:
         static constexpr int MIN_PLAYERS = 2;
         static constexpr int MAX_PLAYERS = 6;
-        std::vector<unique_ptr<Player>> players;
+        std::vector<Player*> players;
 
-        
-        bool addPlayer(unique_ptr<Player> player) ;
+        ~PlayerManager(); 
+        bool addPlayer(Player* player);
         bool isplayervalid()const;
         bool isplayerindexvalid(int index)const;
         void eliminateplayer(int index);

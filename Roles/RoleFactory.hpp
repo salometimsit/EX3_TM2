@@ -22,6 +22,6 @@ class RoleFactory {
         * @return A unique_ptr to the created Role instance.
         * @throws std::invalid_argument if the role name is unrecognized.
         */
-        static std::unique_ptr<Role> createRole(const std::string& roleName);
+        static Role* createRole(const std::string& roleName);
 };
 #endif
