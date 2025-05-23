@@ -1,7 +1,9 @@
 #include "AllAction.hpp"
-#include "Player.hpp"
+#include "Players/Player.hpp"
 #include <iostream>
 
+
+/** Arrest Action Implementation **/
 std::string Arrest::getactionname() const {
     return "Arrest";
 }
@@ -11,7 +13,7 @@ bool Arrest::isType(const std::string& type) const {
 }
 
 void Arrest::playcard(Player& currplayer) const {
-
+    // No effect in single-player context
 }
 
 void Arrest::playcard(Player& currplayer, Player& other) const {
@@ -22,6 +24,8 @@ void Arrest::playcard(Player& currplayer, Player& other) const {
         other.removecoin(1);
     }
 }
+//--------------------------------------------------------------------------------------------
+/** Bribe Action Implementation **/
 
 std::string Bribe::getactionname() const {
     return "Bribe";
@@ -39,6 +43,9 @@ void Bribe::playcard(Player& currplayer, Player& other) const {
     currplayer.removecoin(4);
 }
 
+//--------------------------------------------------------------------------------------------
+/** Coup Action Implementation **/
+
 std::string Coup::getactionname() const {
     return "Coup";
 }
@@ -54,6 +61,8 @@ void Coup::playcard(Player& currplayer) const {
 void Coup::playcard(Player& currplayer, Player& other) const {
     currplayer.removecoin(7);
 }
+//--------------------------------------------------------------------------------------------
+/** Gather Action Implementation **/
 
 std::string Gather::getactionname() const {
     return "Gather";
@@ -70,6 +79,8 @@ void Gather::playcard(Player& currplayer) const {
 void Gather::playcard(Player& currplayer, Player& other) const {
     currplayer.addcoin(1);
 }
+//--------------------------------------------------------------------------------------------
+/** Sanction Action Implementation **/
 
 std::string Sanction::getactionname() const {
     return "Sanction";
@@ -89,6 +100,8 @@ void Sanction::playcard(Player& currplayer, Player& other) const {
     other.blockAction("Gather");
     std::cout << "[DEBUG] " << other.getnameplayer() << " was sanctioned (Tax & Gather blocked)\n";
 }
+//--------------------------------------------------------------------------------------------
+/** Tax Action Implementation **/
 
 std::string Tax::getactionname() const {
     return "Tax";
@@ -105,6 +118,9 @@ void Tax::playcard(Player& currplayer) const {
 void Tax::playcard(Player& currplayer, Player& other) const {
     currplayer.addcoin(2);
 }
+//--------------------------------------------------------------------------------------------
+//special actoins:
+/** Baroninvest Action Implementation **/
 void Baroninvest::playcard(Player& currplayer) const {
     currplayer.removecoin(3);
     currplayer.addcoin(6);
@@ -120,6 +136,9 @@ bool Baroninvest::isspecial(const std::string& roleName) const{
     }
     return false;
 }
+//--------------------------------------------------------------------------------------------
+/** Governorblocktax Action Implementation **/
+
 void Governorblocktax::playcard(Player& currplayer) const {
 }
 void Governorblocktax::playcard(Player& currplayer, Player& other) const {

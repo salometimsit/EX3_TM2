@@ -13,7 +13,7 @@
 // #include <QLineEdit>
 // #include <QApplication>
 // #include "Actions/ActionFactory.hpp"
-#include "GUI.hpp"
+#include "Gamelogic/GUI.hpp"
 #include <QInputDialog>
 #include <fstream>
 #include <QMessageBox>

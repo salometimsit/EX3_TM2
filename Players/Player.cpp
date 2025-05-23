@@ -1,7 +1,25 @@
 
-#include "Player.hpp"
+#include "Players/Player.hpp"
 #include "Roles/RoleFactory.hpp"
 #include <random>
+
+
+void Player::blockAction(const std::string& actionName) {
+    blockedactions.insert(actionName);
+}
+void Player::unblockAllActions() {
+        blockedactions.clear();
+}
+bool Player::isActionBlocked(const std::string& actionName) const {
+    return blockedactions.find(actionName) != blockedactions.end();
+}
+
+void Player::addcoin(int amount){
+    if(amount<0){
+        throw std::runtime_error("Cannot add negative coins");
+    }
+    coins+=amount;
+}
 
 std::unique_ptr<Role> Player::assignroles(){
             std::random_device rd;
@@ -25,4 +43,4 @@ std::unique_ptr<Role> Player::assignroles(){
                 default:
                     throw std::runtime_error("Invalid role assignment");
             }
-        }
+}

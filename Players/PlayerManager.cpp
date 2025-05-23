@@ -2,8 +2,8 @@
 #include <vector>
 #include <memory>
 #include <stdexcept>
-#include "PlayerManager.hpp"
-#include "Player.hpp"
+#include "Players/PlayerManager.hpp"
+#include "Players/Player.hpp"
 #include <random>
 #include <algorithm>
 

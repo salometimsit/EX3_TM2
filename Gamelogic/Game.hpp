@@ -4,8 +4,8 @@
 #pragma once
 #include <unordered_set>
 #include "Roles/RoleFactory.hpp"
-#include "Player.hpp"
-#include "PlayerManager.hpp"
+#include "Players/Player.hpp"
+#include "Players/PlayerManager.hpp"
 #include "Actions/ActionFactory.hpp"
 #include <iostream>
 #include <vector>
@@ -13,7 +13,10 @@
 #include <string>
 #include <stdexcept>
 
-
+/**
+ * @class Game
+ * @brief Manages the state and flow of the game including players, turns, and actions.
+ */
 class Game {
 private:
     int currentPlayerIndex;
@@ -24,24 +27,18 @@ private:
 public:
     Game() : gameOver(false), currentPlayerIndex(0),bribebonus(0) {}
     std::unordered_set<std::string> arrestblocknext;
-    void blockarrestfornext( Player& player) {
-        std::cout << "[DEBUG] Blocking arrest for player: " << player.getnameplayer() << std::endl;
-        std::cout << "[DEBUG] Address of player in blockarrest: " << &player << std::endl;
-        arrestblocknext.insert(player.getnameplayer());
-    }
-    void clearArrestBlock() {
-        if (currentPlayerIndex >= 0 && currentPlayerIndex < playerManager.players.size() && playerManager.players[currentPlayerIndex]) {
-            arrestblocknext.erase(playerManager.players[currentPlayerIndex]->getnameplayer());
-        }
-
-    }
-    bool isarrestblocked( Player& player) {
-        return arrestblocknext.count(player.getnameplayer()) > 0;
-    }
-    
+    /** Prevents Arrest action against a player for the next turn. */
+    void blockarrestfornext( Player& player);
+    /** Clears all arrest blocks after turn resolution. */
+    void clearArrestBlock();
+    /** Checks if a player is protected from Arrest. */
+    bool isarrestblocked( Player& player);
+    /** Adds a new player to the game. */
     void addPlayer(const std::string& name);
+    /** Prepares and starts the game */
     void startGame();
     std::string winner() const;
+    
     void playTurn(const Action& action, int targetIndex=-1);
     void moveToNextPlayer();
     bool checkGameOver();

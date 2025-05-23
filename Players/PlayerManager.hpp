@@ -4,7 +4,7 @@
 #include <vector>
 #include <memory>
 #include <stdexcept>
-#include "Player.hpp"
+#include "Players/Player.hpp"
 //#include "Roles/RoleFactory.hpp"
 #include <random>
 #include <algorithm>

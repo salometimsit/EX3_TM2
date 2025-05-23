@@ -9,7 +9,7 @@
 #include <QGroupBox>
 #include <QStackedLayout>
 #include <vector>
-#include "Game.hpp"
+#include "Gamelogic/Game.hpp"
 
 class GUI : public QMainWindow {
     Q_OBJECT

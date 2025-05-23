@@ -1,6 +1,6 @@
 #include <QApplication>
-#include "GUI.hpp"
-#include "Game.hpp"
+#include "Gamelogic/GUI.hpp"
+#include "Gamelogic/Game.hpp"
 
 int main(int argc, char *argv[]) {
     try {

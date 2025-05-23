@@ -12,6 +12,7 @@ class RoleFactory;
 #include <iostream>
 #include <unordered_set>
 #include <unordered_map>
+using namespace std;
 using std::unique_ptr;
 class Player{
     private: 
@@ -25,28 +26,17 @@ class Player{
         std::unique_ptr<Role> assignroles();
         Player(const std::string& name):name(name), coins(0), role(assignroles()){}
         ~Player()=default;
-        void blockAction(const std::string& actionName) {
-            blockedactions.insert(actionName);
-        }
-
-        void unblockAllActions() {
-            blockedactions.clear();
-        }
-        bool isActionBlocked(const std::string& actionName) const {
-            std::cout << "[DEBUG] Checking if blocked: " << actionName << " → " 
-              << (blockedactions.find(actionName) != blockedactions.end() ? "YES" : "NO") << std::endl;
-            return blockedactions.find(actionName) != blockedactions.end();
-        }
+        void blockAction(const std::string& actionName);
+        void unblockAllActions();
+        bool isActionBlocked(const std::string& actionName) const;
         std::string getnameplayer(){return name;}
         int getcoins(){return coins;}
         const Role* getrole(){return role.get();}
         void setcoins(int c){coins=c;}
         void setname(const string& n){name=n;}
         void setrole(unique_ptr<Role> r){role=std::move(r);}
-        void addcoin(int amount){coins+=amount;} 
+        void addcoin(int amount); 
         void removecoin(int amount){if(coins>=amount){coins-=amount;}else{throw::std::runtime_error("not enough coins");}}//return error if amount>valid 
         
-
-    //is role / set role / eliminate / activate 
 };
 #endif

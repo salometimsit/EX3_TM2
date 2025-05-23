@@ -1,7 +1,7 @@
 // Game.cpp
-#include "Game.hpp"
-#include "Player.hpp"
-#include "PlayerManager.hpp"
+#include "Gamelogic/Game.hpp"
+#include "Players/Player.hpp"
+#include "Players/PlayerManager.hpp"
 #include "Actions/ActionFactory.hpp"
 #include "Roles/RoleFactory.hpp"
 #include <iostream>
@@ -13,6 +13,34 @@
 
 using namespace std;
 
+/**
+ * @brief Blocks the "Arrest" action for the specified player for their next turn.
+ * @param player The player to protect from arrest.
+ */
+void Game::blockarrestfornext( Player& player) {
+        arrestblocknext.insert(player.getnameplayer());
+}
+/**
+ * @brief Removes the arrest block for the current player after their turn.
+ */
+void Game::clearArrestBlock() {
+    if (currentPlayerIndex >= 0 && currentPlayerIndex < playerManager.players.size() && playerManager.players[currentPlayerIndex]) {
+        arrestblocknext.erase(playerManager.players[currentPlayerIndex]->getnameplayer());
+    }
+}
+/**
+ * @brief Checks if a player is currently protected from the "Arrest" action.
+ * @param player The player to check.
+ * @return true if the player is protected, false otherwise.
+ */
+bool Game::isarrestblocked( Player& player) {
+    return arrestblocknext.count(player.getnameplayer()) > 0;
+}
+/**
+ * @brief Adds a new player to the game.
+ * @param name The player's name.
+ * @throws std::runtime_error if the maximum player count is reached.
+ */
 void Game::addPlayer(const string& name) {
     // Add a player if we haven't reached the max player count
     Player* player = new Player(name);
@@ -22,16 +50,14 @@ void Game::addPlayer(const string& name) {
         throw std::runtime_error("Maximum number of players reached");
     }
 }
-
+/**
+ * @brief Starts the game and validates player setup.
+ * @throws std::runtime_error if player setup is invalid.
+ */
 void Game::startGame() {
-    std::cout << "[DEBUG] startGame() called\n";
-    std::cout << "[DEBUG] players count: " << playerManager.players.size() << "\n";
-
     for (size_t i = 0; i < playerManager.players.size(); ++i) {
         if (!playerManager.players[i]) {
             std::cout << "[ERROR] player " << i << " is null\n";
-        } else {
-            std::cout << "[DEBUG] player " << i << " name: " << playerManager.players[i]->getnameplayer() << "\n";
         }
     }
     if (playerManager.isplayervalid()) {
@@ -43,7 +69,11 @@ void Game::startGame() {
         throw std::runtime_error("Invalid number of players");
     }
 }
-
+ /**
+* @brief Executes a player's action during their turn.
+* @param action The action to perform.
+* @param targetIndex Optional index of the targeted player (-1 if none).
+*/
 void Game::playTurn(const Action& action, int targetIndex) {
     if (gameOver) {
         cout << "Game is over. Cannot play turn." << endl;
@@ -59,10 +89,7 @@ void Game::playTurn(const Action& action, int targetIndex) {
     for (auto& [target, cooldown] : currentPlayer.arrestCooldown) {
         if (cooldown > 0) --cooldown;
     }
-    std::cout << "[DEBUG] Arrest block check: " << currentPlayer.getnameplayer()
-          << ", blocked? " << isarrestblocked(currentPlayer) << "\n";
     currentPlayer.unblockAllActions();
-    std::cout << "[DEBUG] unblockAllActions() called for player " << currentPlayer.getnameplayer() << "\n";
     if (action.isType("Arrest")) {
         std::string currentName = currentPlayer.getnameplayer();
         if (isarrestblocked(currentPlayer)) {
@@ -83,7 +110,6 @@ void Game::playTurn(const Action& action, int targetIndex) {
     if (playerManager.isplayerindexvalid(targetIndex)) {
         
         targetPlayer = playerManager.players[targetIndex].get();
-        std::cout << "[DEBUG] Playing action: " << action.getactionname() << "\n";
         if (targetPlayer&& action.isType("Sanction")) {
             Player* target = playerManager.players[targetIndex].get();
             if (target && target->getrole() && target->getrole()->getrolename() == "Judge") {
@@ -94,10 +120,9 @@ void Game::playTurn(const Action& action, int targetIndex) {
         }
         action.playcard(currentPlayer, *targetPlayer);
         if (currentPlayer.getrole()) {
-            currentPlayer.getrole()->roleonaction(currentPlayer, action, targetPlayer);  // 🔁 MISSING RIGHT NOW
+            currentPlayer.getrole()->roleonaction(currentPlayer, action, targetPlayer); 
         }
         if (targetPlayer && targetPlayer->getrole()) {
-            std::cout << "[DEBUG] Target role: " << targetPlayer->getrole()->getrolename() << "\n";
             targetPlayer->getrole()->roledefence(*targetPlayer, action, currentPlayer);
         }
         if (targetPlayer&&action.isType("Coup")) {
@@ -106,7 +131,6 @@ void Game::playTurn(const Action& action, int targetIndex) {
                 if (targetIndex < currentPlayerIndex) {
                     currentPlayerIndex--;
                 }
-                std::cout << "[DEBUG] Target role: ";
                 if (currentPlayerIndex >= playerManager.players.size()) {
                     currentPlayerIndex = 0;
                 }
@@ -116,7 +140,6 @@ void Game::playTurn(const Action& action, int targetIndex) {
 
     } 
     else {
-        std::cout << "[DEBUG] Playing non-targeted action: " << action.getactionname() << "\n";
         action.playcard(currentPlayer);
         if (currentPlayer.getrole()) {
             currentPlayer.getrole()->roleonaction(currentPlayer, action, targetPlayer);
@@ -126,20 +149,20 @@ void Game::playTurn(const Action& action, int targetIndex) {
     if (action.isType("Bribe")) {
         bribebonus = 2;  // Give two extra turns
     }
-
-    //clearArrestBlock(currentPlayer); // Clear the block after the action
     clearArrestBlock();
     if (!checkGameOver()) {
         if (bribebonus > 0) {
             std::cout << "[DEBUG] Bribe bonus turn, remaining: " << bribebonus << "\n";
-            bribebonus--;  // one used
-            return;        // stay on same player
+            bribebonus--;  
+            return;       
         } else {
             moveToNextPlayer();
         }
     }
 }
-
+/**
+ * @brief Advances the game to the next active player.
+ */
 void Game::moveToNextPlayer() {
     int playerCount = playerManager.players.size();
     if (playerCount == 0) return;
@@ -159,16 +182,16 @@ void Game::moveToNextPlayer() {
     //               << playerManager.players[currentPlayerIndex]->getnameplayer() << "\n";
     // }
 }
-
+/**
+ * @brief Checks if only one player remains.
+ * @return true if the game is over, false otherwise.
+ */
 bool Game::checkGameOver() {
-    std::cout << "Entering checkGameOver()\n";
     int activePlayers = 0;
     int lastIndex = -1;
     
     for (size_t i = 0; i < playerManager.players.size(); i++) {
-        std::cout << "Checking player index " << i << "\n";
         if (playerManager.players[i]) {
-            std::cout << "Player " << i << " is not null\n";
             activePlayers++;
             lastIndex = i;
         }
@@ -179,15 +202,20 @@ bool Game::checkGameOver() {
         endGame();
         return true;
     }
-    std::cout << "Exiting checkGameOver()\n";
     return false;
 }
-
+/**
+ * @brief Ends the game and announces the winner.
+ */
 void Game::endGame() {
     cout << "Game over. " << winner() << " wins!" << endl;
 
 }
 
+/**
+ * @brief Gets the name of the last remaining player.
+ * @return Name of the winner or "No winner" if none found.
+ */
 std::string Game::winner() const {
     for (const auto& player : playerManager.players) {
         if (player) {
@@ -196,7 +224,10 @@ std::string Game::winner() const {
     }
     return "No winner";
 }
-
+/**
+ * @brief Lists the names of all players in the game.
+ * @return Vector of player names.
+ */
 std::vector<std::string> Game::playersList() {
     std::vector<std::string> playerNames;
     for (const auto& player : playerManager.players) {
@@ -206,7 +237,10 @@ std::vector<std::string> Game::playersList() {
     }
     return playerNames;
 }
-
+/**
+ * @brief Gets the name of the player whose turn it is.
+ * @return Player name or empty string if invalid.
+ */
 std::string Game::turn() const {
     if (currentPlayerIndex >= 0 && 
         currentPlayerIndex < playerManager.players.size() && 
@@ -216,7 +250,10 @@ std::string Game::turn() const {
     return "";
 }
 
-
+/**
+ * @brief Retrieves a pointer to the current player.
+ * @return Pointer to current player, or nullptr if invalid.
+ */
 Player* Game::getCurrentPlayer() {
     if (currentPlayerIndex < 0 || currentPlayerIndex >= playerManager.players.size()) {
         std::cout << "[ERROR] getCurrentPlayer(): invalid index\n";
@@ -230,6 +267,10 @@ Player* Game::getCurrentPlayer() {
     return nullptr;
 }
 
+/**
+ * @brief Gets the coin count of the current player.
+ * @return Number of coins, or 0 if invalid.
+ */
 int Game::getCurrentPlayerCoins() {
     Player* current = getCurrentPlayer();
     if (current) {
@@ -237,7 +278,10 @@ int Game::getCurrentPlayerCoins() {
     }
     return 0;
 }
-
+/**
+ * @brief Gets the role name of the current player.
+ * @return Role name or "Unknown" if not assigned.
+ */
 std::string Game::getCurrentPlayerRole() {
     Player* current = getCurrentPlayer();
     if (current&&current->getrole()) {
@@ -245,7 +289,11 @@ std::string Game::getCurrentPlayerRole() {
     }
     return "Unknown";
 }
-
+/**
+ * @brief Finds a player by name.
+ * @param name Name of the player to find.
+ * @return Index of the player or -1 if not found.
+ */
 int Game::getPlayerIndexByName(const std::string& name) {
     for (size_t i = 0; i < playerManager.players.size(); ++i) {
         if (playerManager.players[i] && playerManager.players[i]->getnameplayer() == name) {
@@ -254,6 +302,11 @@ int Game::getPlayerIndexByName(const std::string& name) {
     }
     return -1;
 }
+/**
+ * @brief Retrieves a pointer to the player at the given index.
+ * @param index Index of the player.
+ * @return Pointer to player, or nullptr if invalid.
+ */
 Player* Game::getPlayerByIndex(int index) {
     if (index < 0 ) {
         std::cerr << "[ERROR] getPlayerByIndex: index out of bounds: " << index << "\n";
@@ -261,7 +314,12 @@ Player* Game::getPlayerByIndex(int index) {
     }
     return playerManager.getPlayerByIndex(index);
 }
-
+/**
+ * @brief Resolves a blocking attempt from one player against another.
+ * @param blocker Player attempting the block.
+ * @param action Action to block.
+ * @param attacker Player performing the action.
+ */
 void Game::blockaction(Player& blocker, const Action& action, Player& attacker){
     if(blocker.getrole()){
         if(blocker.getrole()->canblock(action)){
@@ -272,6 +330,11 @@ void Game::blockaction(Player& blocker, const Action& action, Player& attacker){
         throw std::runtime_error("blocker has no role");
     }
 }
+/**
+ * @brief Checks whether the current player can block the given action.
+ * @param action The action in question.
+ * @return true if blockable, false otherwise.
+ */
 bool Game::canblock(const Action& action) const {
     return playerManager.isplayerindexvalid(currentPlayerIndex) &&
            playerManager.players[currentPlayerIndex]->getrole()->canblock(action);
