@@ -5,6 +5,7 @@
 
 Player::~Player() {
     delete role;
+    std::cout << "[DEBUG] Destroying player: " << name << std::endl;
 }
 
 Player::Player(const std::string& name) : name(name), coins(0) {
@@ -23,9 +24,11 @@ Player& Player::operator=(const Player& other) {
     role = RoleFactory::createRole(other.role->getrolename());
     return *this;
 }
-void Player::setrole(Role* r) {
-    delete role;  // clean up old one first
-    role = r;
+void Player::setrole(Role* newRole) {
+    if (role) {
+        delete role;  // 🛠️ Clean up the old role
+    }
+    role = newRole;
 }
 void Player::blockAction(const std::string& actionName) {
     blockedactions.insert(actionName);

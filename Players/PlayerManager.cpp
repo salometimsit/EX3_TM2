@@ -10,6 +10,7 @@
 
 PlayerManager::~PlayerManager() {
     for (Player* p : players) {
+        std::cout << "[DEBUG] Deleting from PlayerManager: " << p->getnameplayer() << std::endl;
         delete p;
     }
 }
@@ -44,6 +45,7 @@ void PlayerManager::eliminateplayer(int index) {
     if (index < 0 || static_cast<size_t>(index) >= players.size()) {
         throw std::out_of_range("Invalid player index");
     }
+    delete players[index];
     players.erase(players.begin() + index);
 }
 

@@ -19,7 +19,7 @@ class Player{
         std::string name;
         int coins;
         // std::unique_ptr<Role> role;
-        Role* role;
+        Role* role=nullptr;
         std::unordered_set<std::string> blockedactions;
         
     public:

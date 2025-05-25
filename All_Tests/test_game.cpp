@@ -4,12 +4,10 @@
 #include "Roles/AllRole.hpp"
 #include "Actions/AllAction.hpp"
 
-// יצירת שחקן עם תפקיד וסכום מטבעות
-std::unique_ptr<Player> makePlayer(const std::string& name, std::unique_ptr<Role> role, int coins = 0) {
-    auto p = std::make_unique<Player>(name);
-    p->setrole(std::move(role));
-    p->setcoins(coins);
-    return p;
+TEST_CASE("Game throws on start with only one player") {
+    Game game;
+    game.addPlayer("OnlyOne");
+    CHECK_THROWS(game.startGame());
 }
 TEST_CASE("Adding players and starting the game") {
     Game game;

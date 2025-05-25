@@ -42,6 +42,8 @@ $(TARGET): $(OBJ)
 # Test target build
 $(TEST_TARGET): $(TEST_OBJ)  $(filter-out main.o, $(OBJ))
 	$(CXX) $(CXXFLAGS) $^ -o $@ $(QTFLAGS)
+valgrind-tests: $(TEST_TARGET)
+	valgrind --leak-check=full --track-origins=yes ./$(TEST_TARGET)
 
 clean:
 	rm -f $(OBJ) $(TARGET) $(TEST_OBJ) $(TEST_TARGET) Gamelogic/moc_GUI.cpp

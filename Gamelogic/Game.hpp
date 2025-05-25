@@ -25,7 +25,7 @@ private:
     int bribebonus = 0; 
     
 public:
-    Game() : gameOver(false), currentPlayerIndex(0),bribebonus(0) {}
+    Game() : currentPlayerIndex(0), gameOver(false), bribebonus(0) {}
     std::unordered_set<std::string> arrestblocknext;
     /** Prevents Arrest action against a player for the next turn. */
     void blockarrestfornext( Player& player);

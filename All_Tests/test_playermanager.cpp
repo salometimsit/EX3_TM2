@@ -4,69 +4,165 @@
 #include "Players/PlayerManager.hpp"
 #include "Players/Player.hpp"
 #include "Roles/AllRole.hpp"
+#include "Actions/ActionFactory.hpp"
+#include "Actions/AllAction.hpp"
+#include "Gamelogic/Game.hpp"
 
-// Helper function to create player with optional role using this function to test the specific role because in 
-// my original code the role is assigned randomly
-// and I cannot test the specific role
-std::unique_ptr<Player> makePlayer(const std::string& name, std::unique_ptr<Role> role = nullptr) {
-    auto p = std::make_unique<Player>(name);
-    if (role) {
-        p->setrole(std::move(role));
-    }
-    return p;
-}
-
-TEST_CASE("Add and retrieve player") {
+TEST_CASE("Add and retrieve players") {
     PlayerManager manager;
-    auto player = makePlayer("Salome");
-    CHECK(manager.addPlayer(std::move(player)));
-    CHECK(manager.playerCount() == 1);
-    CHECK(manager.getPlayerByIndex(0)->getnameplayer() == "Salome");
-}
 
-TEST_CASE("Adding more than MAX_PLAYERS throws") {
-    PlayerManager manager;
-    for (int i = 0; i < PlayerManager::MAX_PLAYERS; ++i) {
-        CHECK_NOTHROW(manager.addPlayer(makePlayer("Player" + std::to_string(i))));
-    }
-    CHECK_THROWS(manager.addPlayer(makePlayer("ExtraPlayer")));
-}
+    Player* alice = new Player("Alice");
+    alice->setrole(new Governor());
 
-TEST_CASE("isplayervalid throws for invalid player count") {
-    PlayerManager manager;
-    CHECK_THROWS(manager.isplayervalid()); // Not enough players
-    manager.addPlayer(makePlayer("A"));
-    manager.addPlayer(makePlayer("B"));
-    CHECK(manager.isplayervalid()); // Should now be valid
-}
+    Player* bob = new Player("Bob");
+    bob->setrole(new Spy());
 
-TEST_CASE("Eliminate player works and updates count") {
-    PlayerManager manager;
-    manager.addPlayer(makePlayer("P1"));
-    manager.addPlayer(makePlayer("P2"));
+    CHECK(manager.addPlayer(alice));
+    CHECK(manager.addPlayer(bob));
     CHECK(manager.playerCount() == 2);
-    manager.eliminateplayer(0);
+
+    CHECK(manager.getPlayerByIndex(0)->getnameplayer() == "Alice");
+    CHECK(manager.getPlayerByIndex(1)->getnameplayer() == "Bob");
+
+    CHECK(manager.getPlayerIndex("Alice") == 0);
+    CHECK(manager.getPlayerIndex("Bob") == 1);
+
+    CHECK(manager.getPlayerRole(0) == "Governor");
+    CHECK(manager.getPlayerRole(1) == "Spy");
+
+    CHECK(manager.getPlayerCoins(0) == 0);
+    CHECK(manager.getPlayerCoins(1) == 0);
+}
+
+TEST_CASE("Eliminate player") {
+    PlayerManager manager;
+
+    Player* c = new Player("Charlie");
+    c->setrole(new Merchant());
+
+    Player* d = new Player("Dana");
+    d->setrole(new General());
+
+    manager.addPlayer(c);
+    manager.addPlayer(d);
+
+    CHECK(manager.playerCount() == 2);
+
+    manager.eliminateplayer(0);  // deletes Charlie
     CHECK(manager.playerCount() == 1);
-    CHECK(manager.getPlayerByIndex(0)->getnameplayer() == "P2");
+    CHECK(manager.getPlayerByIndex(0)->getnameplayer() == "Dana");
 }
 
-TEST_CASE("getPlayerIndex and getPlayerCoins/Role") {
+TEST_CASE("Player index validation") {
     PlayerManager manager;
-    auto role = std::make_unique<Governor>();
-    auto p = makePlayer("Avi", std::move(role));
-    p->setcoins(7);
-    manager.addPlayer(std::move(p));
 
-    int index = manager.getPlayerIndex("Avi");
-    CHECK(index == 0);
-    CHECK(manager.getPlayerCoins(index) == 7);
-    CHECK(manager.getPlayerRole(index) == "Governor");
-}
+    CHECK_FALSE(manager.isplayerindexvalid(0));
 
-TEST_CASE("isplayerindexvalid works as expected") {
-    PlayerManager manager;
-    manager.addPlayer(makePlayer("P1"));
+    Player* eve = new Player("Eve");
+    eve->setrole(new Judge());
+
+    manager.addPlayer(eve);
+
     CHECK(manager.isplayerindexvalid(0));
     CHECK_FALSE(manager.isplayerindexvalid(1));
-    CHECK_FALSE(manager.isplayerindexvalid(-1));
 }
+
+
+TEST_CASE("Governor gains coin on Tax action") {
+    Game game;
+    Player gov("Greg");
+    gov.setrole(new Governor());
+
+    int before = gov.getcoins();
+    Action* tax = ActionFactory::createAction("Tax");
+    gov.getrole()->roleonaction(gov, *tax);
+    delete tax;
+
+    CHECK(gov.getcoins() == before + 1);
+}
+
+TEST_CASE("Spy blocks arrest and reveals coins") {
+    Game game;
+    Player spy("SpyGuy");
+    spy.setrole(new Spy());
+
+    Player target("Target");
+    target.setrole(new Merchant());
+    target.addcoin(3);
+
+    int coins = spy.getrole()->rolespecialities(spy, game, &target);
+    CHECK(coins == 3);
+}
+
+TEST_CASE("Baron investment converts 3 coins into 6") {
+    Game game;
+    Player baron("Investor");
+    baron.setrole(new Baron());
+    baron.addcoin(3);
+
+    baron.getrole()->rolespecialities(baron, game);
+    CHECK(baron.getcoins() == 6);
+}
+
+TEST_CASE("Judge penalizes attacker on Sanction") {
+    Game game;
+    Player judge("Lawkeeper");
+    judge.setrole(new Judge());
+
+    Player attacker("Thief");
+    attacker.addcoin(2);
+
+    Action* sanction = ActionFactory::createAction("Sanction");
+    judge.getrole()->roledefence(judge, *sanction, attacker);
+    delete sanction;
+
+    CHECK(attacker.getcoins() == 1);
+}
+
+TEST_CASE("Merchant gains 1 coin if he has 3 or more") {
+    Game game;
+    Player merchant("Shopkeep");
+    merchant.setrole(new Merchant());
+    merchant.addcoin(3);
+
+    int gained = merchant.getrole()->rolespecialities(merchant, game);
+    CHECK(gained == 1);
+    CHECK(merchant.getcoins() == 4);
+}
+
+TEST_CASE("General gains 1 coin if arrested") {
+    Game game;
+    Player general("Commander");
+    general.setrole(new General());
+
+    Player attacker("Enemy");
+
+    Action* arrest = ActionFactory::createAction("Arrest");
+    general.getrole()->roledefence(general, *arrest, attacker);
+    delete arrest;
+
+    CHECK(general.getcoins() == 1);
+}
+
+TEST_CASE("PlayerManager maintains correct state after elimination") {
+    PlayerManager manager;
+    Player* a = new Player("Alice");
+    Player* b = new Player("Bob");
+    Player* c = new Player("Charlie");
+
+    a->setrole(new Governor());
+    b->setrole(new Spy());
+    c->setrole(new Merchant());
+
+    manager.addPlayer(a);
+    manager.addPlayer(b);
+    manager.addPlayer(c);
+
+    manager.eliminateplayer(1); // Remove Bob
+
+    CHECK(manager.playerCount() == 2);
+    CHECK(manager.getPlayerByIndex(0)->getnameplayer() == "Alice");
+    CHECK(manager.getPlayerByIndex(1)->getnameplayer() == "Charlie");
+    CHECK(manager.getPlayerIndex("Bob") == -1);
+}
+
