@@ -88,4 +88,3 @@ class General:public Role {
 };
 
 #endif
-

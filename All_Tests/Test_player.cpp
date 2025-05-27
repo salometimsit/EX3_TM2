@@ -3,6 +3,46 @@
 #include "Players/Player.hpp"
 #include "Roles/RoleFactory.hpp"
 
+
+
+TEST_CASE("Player name setter and getter") {
+    Player p("Temp");
+    p.setname("NewName");
+    CHECK(p.getnameplayer() == "NewName");
+}
+TEST_CASE("Player setcoins and getcoins") {
+    Player p("Lior");
+    p.setcoins(7);
+    CHECK(p.getcoins() == 7);
+}
+TEST_CASE("Set role manually and get role name") {
+    Player p("Dana");
+    Role* r = RoleFactory::createRole("Spy");
+    p.setrole(r);
+    CHECK(p.getrole()->getrolename() == "Spy");
+}
+TEST_CASE("Blocking same action twice has no side effect") {
+    Player p("Alex");
+    p.blockAction("Tax");
+    p.blockAction("Tax");
+    CHECK(p.isActionBlocked("Tax"));
+}
+TEST_CASE("Unblocking with nothing blocked") {
+    Player p("Noa");
+    CHECK_FALSE(p.isActionBlocked("Coup"));
+    CHECK_NOTHROW(p.unblockAllActions());  // should be safe
+}
+TEST_CASE("Assigning a new role replaces old role") {
+    Player p("Eden");
+    Role* first = RoleFactory::createRole("Spy");
+    Role* second = RoleFactory::createRole("Governor");
+
+    p.setrole(first);
+    CHECK(p.getrole()->getrolename() == "Spy");
+
+    p.setrole(second);  // old role should be deleted
+    CHECK(p.getrole()->getrolename() == "Governor");
+}
 TEST_CASE("Player coin manipulation") {
     Player p("Alice");
 

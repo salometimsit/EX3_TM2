@@ -92,15 +92,6 @@ public:
     bool isspecial(const std::string& roleName) const override;
 };
 //--------------------------------------------------------------------------------------------
-// class Generalprotectother: public SpecialAction {
-//     public:
-//         std::string getactionname() const override{return "Generalprotectother";};
-//         bool isType(const std::string& type) const override;
-//         void playcard(Player& currplayer) const override;
-//         void playcard(Player& currplayer, Player& other) const override;
-//         bool isspecial(const std::string& roleName) const override;
-// };
-
 /**
  * @class Governorblocktax
  * @brief A special action that allows the "Governor" to block a tax.

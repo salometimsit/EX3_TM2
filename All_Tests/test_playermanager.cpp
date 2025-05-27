@@ -8,6 +8,85 @@
 #include "Actions/AllAction.hpp"
 #include "Gamelogic/Game.hpp"
 
+
+TEST_CASE("Getting role of invalid player index returns 'Unknown'") {
+    PlayerManager manager;
+    CHECK(manager.getPlayerRole(0) == "Unknown");
+}
+
+TEST_CASE("Governor does not gain extra coin from non-Tax action") {
+    Player g("Greg");
+    g.setrole(new Governor());
+    int before = g.getcoins();
+
+    Gather gather;
+    g.getrole()->roleonaction(g, gather);  // Should not affect coins
+    CHECK(g.getcoins() == before);
+}
+TEST_CASE("Spy blocks arrest only for the target") {
+    Game game;
+    Player spy("SpyGuy");
+    spy.setrole(new Spy());
+
+    Player target("Victim");
+    target.setrole(new General());
+    target.addcoin(3);
+
+    spy.getrole()->rolespecialities(spy, game, &target);
+
+    CHECK(game.isarrestblocked(target));
+    CHECK_FALSE(game.isarrestblocked(spy));
+}
+TEST_CASE("Judge does not react to non-Sanction action") {
+    Game game;
+    Player judge("Judge");
+    judge.setrole(new Judge());
+
+    Player attacker("Bob");
+    attacker.setcoins(5);
+
+    Action* tax = ActionFactory::createAction("Tax");
+    CHECK_NOTHROW(judge.getrole()->roledefence(judge, *tax, attacker));
+    delete tax;
+
+    CHECK(attacker.getcoins() == 5);  // no penalty
+}
+TEST_CASE("Merchant with less than 2 coins cannot pay arrest penalty") {
+    Player m("Shopkeep");
+    m.setrole(new Merchant());
+    m.setcoins(1);
+
+    Player attacker("Thief");
+
+    Action* arrest = ActionFactory::createAction("Arrest");
+    CHECK_THROWS(m.getrole()->roledefence(m, *arrest, attacker));
+    delete arrest;
+}
+TEST_CASE("General blocks Coup and loses no coins") {
+    Player general("Shield");
+    general.setrole(new General());
+    general.setcoins(3);
+
+    Player attacker("Attacker");
+    attacker.setcoins(10);
+
+    Action* coup = ActionFactory::createAction("Coup");
+    general.getrole()->roledefence(general, *coup, attacker);
+    delete coup;
+
+    // Attacker loses 7 coins (done in Game), but general unaffected
+    CHECK(general.getcoins() == 3);
+}
+TEST_CASE("Cannot add more than 6 players") {
+    PlayerManager manager;
+    for (int i = 0; i < 6; ++i) {
+        CHECK_NOTHROW(manager.addPlayer(new Player("P" + std::to_string(i))));
+    }
+
+    Player* overflow = new Player("Overflow");
+    CHECK_THROWS(manager.addPlayer(overflow));
+    delete overflow;  // ✅ clean up manually
+}
 TEST_CASE("Add and retrieve players") {
     PlayerManager manager;
 

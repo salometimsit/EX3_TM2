@@ -19,7 +19,7 @@
  */
 class Game {
 private:
-    int currentPlayerIndex;
+    size_t currentPlayerIndex;
     bool gameOver;
     PlayerManager playerManager;
     int bribebonus = 0; 

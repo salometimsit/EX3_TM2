@@ -33,9 +33,9 @@ class Player{
         void blockAction(const std::string& actionName);
         void unblockAllActions();
         bool isActionBlocked(const std::string& actionName) const;
-        std::string getnameplayer(){return name;}
-        int getcoins(){return coins;}
-        const Role* getrole(){return role;}
+        std::string getnameplayer() const { return name; }
+        int getcoins() const { return coins; }
+        const Role* getrole() const { return role; }
         void setcoins(int c){coins=c;}
         void setname(const string& n){name=n;}
         void setrole(Role* r);

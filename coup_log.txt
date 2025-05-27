@@ -1,34 +1,36 @@
-[2025-05-25 21:19:09] GUI constructor started
-[2025-05-25 21:19:09] AddPlayer screen loaded
-[2025-05-25 21:19:13] Player added: 1
-[2025-05-25 21:19:14] Player added: 2
-[2025-05-25 21:19:15] Game started with 2 players
-[2025-05-25 21:19:16] [Before] Tax by 1 (Coins: 0)
-[2025-05-25 21:19:16] [After] Tax by 1 (Coins: 2)
-[2025-05-25 21:19:17] [Before] Gather by 2 (Coins: 0)
-[2025-05-25 21:19:17] [After] Gather by 2 (Coins: 1)
-[2025-05-25 21:19:19] Spy used on: 2
-[2025-05-25 21:19:21] [Before] Gather by 1 (Coins: 2)
-[2025-05-25 21:19:21] [After] Gather by 1 (Coins: 3)
-[2025-05-25 21:19:23] [Before] Tax by 2 (Coins: 1)
-[2025-05-25 21:19:23] [After] Tax by 2 (Coins: 3)
-[2025-05-25 21:19:26] Spy used on: 2
-[2025-05-25 21:19:32] [Before] Arrest by 1 (Coins: 3)
-[2025-05-25 21:19:32] [After] Arrest by 1 (Coins: 4)
-[2025-05-25 21:19:40] [Before] Sanction by 2 (Coins: 2)
-[2025-05-25 21:19:40] ACTION FAILED: Sanction by 2 — ERROR: not enough coins
-[2025-05-25 21:19:42] [Before] Tax by 2 (Coins: 2)
-[2025-05-25 21:19:42] [After] Tax by 2 (Coins: 4)
-[2025-05-25 21:19:46] Spy used on: 2
-[2025-05-25 21:19:55] [Before] Tax by 1 (Coins: 4)
-[2025-05-25 21:19:55] [After] Tax by 1 (Coins: 6)
-[2025-05-25 21:19:58] [Before] Tax by 2 (Coins: 4)
-[2025-05-25 21:19:58] [After] Tax by 2 (Coins: 6)
-[2025-05-25 21:20:01] Spy used on: 2
-[2025-05-25 21:20:02] [Before] Tax by 1 (Coins: 6)
-[2025-05-25 21:20:02] [After] Tax by 1 (Coins: 8)
-[2025-05-25 21:20:05] [Before] Sanction by 2 (Coins: 6)
-[2025-05-25 21:20:05] [After] Sanction by 2 (Coins: 3)
-[2025-05-25 21:20:36] Spy used on: 2
-[2025-05-25 21:20:49] [Before] Arrest by 1 (Coins: 8)
-[2025-05-25 21:20:49] [After] Arrest by 1 (Coins: 9)
+GUI constructor started
+AddPlayer screen loaded
+Player added: 1
+Player added: 2
+Player added: 3
+Player added: 4
+Player added: 5
+Player added: 6
+Game started with 6 players
+[Before] Tax by 1 (Coins: 0)
+(1 | Role: Baron | Coins: 0) Attempting action: Tax
+[After] Tax by 1 (Coins: 2)
+[Before] Tax by 2 (Coins: 0)
+(2 | Role: General | Coins: 0) Attempting action: Tax
+[After] Tax by 2 (Coins: 2)
+[Before] Tax by 3 (Coins: 0)
+(3 | Role: Judge | Coins: 0) Attempting action: Tax
+[After] Tax by 3 (Coins: 2)
+[Before] Tax by 4 (Coins: 0)
+(4 | Role: Judge | Coins: 0) Attempting action: Tax
+[After] Tax by 4 (Coins: 2)
+[Before] Tax by 5 (Coins: 0)
+(5 | Role: Governor | Coins: 0) Attempting action: Tax
+[After] Tax by 5 (Coins: 3)
+[Before] Tax by 6 (Coins: 0)
+(6 | Role: Merchant | Coins: 0) Attempting action: Tax
+[After] Tax by 6 (Coins: 2)
+[Before] Bribe by 1 (Coins: 2)
+(1 | Role: Baron | Coins: 2) Attempting action: Bribe
+ACTION FAILED: Bribe by 1 — ERROR: not enough coins
+[Before] Gather by 1 (Coins: 2)
+(1 | Role: Baron | Coins: 2) Attempting action: Gather
+[After] Gather by 1 (Coins: 3)
+[Before] Gather by 2 (Coins: 2)
+(2 | Role: General | Coins: 2) Attempting action: Gather
+[After] Gather by 2 (Coins: 3)
