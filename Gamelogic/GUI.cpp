@@ -166,7 +166,8 @@ GUI::GUI(Game& g, QWidget* parent) : QMainWindow(parent), game(g) {
     spyButton = new QPushButton("Spy on Player");
     BaronButton = new QPushButton("Barons investment");
     GovernorButton = new QPushButton("Governor Tax Block");
-    for (auto* btn : {spyButton, BaronButton, GovernorButton}) {
+    JudgeButton = new QPushButton("Judge Block Bribe");
+    for (auto* btn : {spyButton, BaronButton, GovernorButton, JudgeButton}) {
         btn->setStyleSheet(actionBtnStyle);
         actionLayout->addWidget(btn);
         btn->hide();
@@ -175,6 +176,7 @@ GUI::GUI(Game& g, QWidget* parent) : QMainWindow(parent), game(g) {
     connect(spyButton, &QPushButton::clicked, this, &GUI::handleSpyAction);
     connect(BaronButton, &QPushButton::clicked, this, &GUI::handleBaronAction);
     connect(GovernorButton, &QPushButton::clicked, this, &GUI::handleGovernorAction);
+    connect(JudgeButton, &QPushButton::clicked, this, &GUI::handleJudgeAction);
 
     actionGroup->setLayout(actionLayout);
     actionGroup->setVisible(false);
@@ -521,6 +523,40 @@ void GUI::handleGovernorAction() {
         updateGameView();
     }
 }
+void GUI::handleJudgeAction() {
+    bool ok;
+    QStringList items;
+    for (const auto& name : game.playersList()) {
+        if (name != game.turn())
+            items << QString::fromStdString(name);
+    }
+    
+    QString selected = QInputDialog::getItem(this, "Judge", "Block Bribe from player:", items, 0, false, &ok);
+    if (!ok) return;
+
+    int targetIndex = game.getPlayerIndexByName(selected.toStdString());
+    if (targetIndex >= 0) {
+        Player* current = game.getCurrentPlayer();
+        Player* target = game.getPlayerByIndex(targetIndex);
+        if (current && target && current->getrole()) {
+            std::unique_ptr<SpecialAction> special = current->getrole()->getspecial(game, *current, target);
+            if (special) {
+                try {
+                    logEvent("[Before] Judge Block Bribe by " + current->getnameplayer() + 
+                            " on " + target->getnameplayer());
+                    game.playTurn(*special, targetIndex);
+                    logEvent("[After] Judge Block Bribe - turn advanced");
+                    QMessageBox::information(this, "Judge", 
+                        selected + " is now blocked from using Bribe this turn.");
+                } catch (const std::exception& e) {
+                    QMessageBox::warning(this, "Action Failed", e.what());
+                }
+            }
+        }
+        updateGameView();
+    }
+}
+
 
 void GUI::updateGameView() {
     std::string current = game.turn();
@@ -536,6 +572,7 @@ void GUI::updateGameView() {
         spyButton->setVisible(role == "Spy");
         BaronButton->setVisible(role == "Baron");
         GovernorButton->setVisible(role == "Governor");
+        JudgeButton->setVisible(role == "Judge");
     }
 }
 

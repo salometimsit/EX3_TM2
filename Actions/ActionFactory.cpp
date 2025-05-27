@@ -28,6 +28,8 @@ Action* ActionFactory::createAction(const std::string& actionName)  {
         return new Baroninvest();
     } else if(actionName=="Governorblocktax"){
         return new Governorblocktax();
+    }else if (actionName == "Judgeblockbribe") {
+    return new Judgeblockbribe();
     }else {
         throw std::invalid_argument("Invalid action name");
     }

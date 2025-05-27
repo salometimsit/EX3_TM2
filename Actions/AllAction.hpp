@@ -105,4 +105,12 @@ class Governorblocktax: public SpecialAction {
         bool isspecial(const std::string& roleName) const override;
 };
 //--------------------------------------------------------------------------------------------
+class Judgeblockbribe : public SpecialAction {
+public:
+    std::string getactionname() const override { return "Judgeblockbribe"; }
+    bool isType(const std::string& type) const override;
+    void playcard(Player& currplayer) const override;
+    void playcard(Player& currplayer, Player& other) const override;
+    bool isspecial(const std::string& roleName) const override;
+};
 #endif

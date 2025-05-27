@@ -25,6 +25,7 @@ private slots:
     void handleSpyAction();
     void handleBaronAction();
     void handleGovernorAction();
+    void handleJudgeAction();
     void updateGameView();
     bool checkGeneralBlock(int targetIndex, const Action& action);
 
@@ -38,6 +39,7 @@ private:
     QPushButton* spyButton;
     QPushButton* BaronButton;
     QPushButton* GovernorButton;
+    QPushButton* JudgeButton;
     QWidget* addPlayerScreen;
     QWidget* gameScreen;
     QStackedLayout* stackedLayout;

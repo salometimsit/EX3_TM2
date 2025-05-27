@@ -138,7 +138,9 @@ void Judge::roledefence(Player& currplayer, const Action& action, Player& other)
 bool Judge::canblock(const Action& action) const {
     return action.isType("Bribe");
 }
-std::unique_ptr<SpecialAction> Judge::getspecial(Game& game, Player& user, Player* target) const {}
+std::unique_ptr<SpecialAction> Judge::getspecial(Game& game, Player& user, Player* target) const {
+    return std::make_unique<Judgeblockbribe>();
+}
 
 //---------------------------------------------------------------------------------------------
 /** Merchant Implementation **/
