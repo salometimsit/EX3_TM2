@@ -1,18 +1,4 @@
-// #include "GUI.hpp"
-// #include <QInputDialog>
-// #include <QMessageBox>
-// #include <QGroupBox>
-// #include <QVBoxLayout>
-// #include <QHBoxLayout>
-// #include <QDebug>
-// #include <QFile>
-// #include <QPixmap>
-// #include <QPushButton>
-// #include <QLabel>
-// #include <QListWidget>
-// #include <QLineEdit>
-// #include <QApplication>
-// #include "Actions/ActionFactory.hpp"
+
 #include "Gamelogic/GUI.hpp"
 #include <QInputDialog>
 #include <fstream>
@@ -28,11 +14,19 @@
 #include <QLineEdit>
 #include <QApplication>
 #include "Actions/ActionFactory.hpp"
+/**
+    * @brief Global logger function to log events to a file.
+    * @param message The message to log
+ */
 std::ofstream logFile("coup_log.txt");
-
 void logEvent(const std::string& message) {
     logFile << message << std::endl;
 }
+/**
+    * @brief Logs an event with player details.
+    * @param message The message to log
+    * @param player Pointer to the player involved in the event
+ */
 void logEventWithRole(const std::string& message, const Player* player) {
     std::string name = player ? player->getnameplayer() : "UnknownPlayer";
     std::string role = (player && player->getrole()) ? player->getrole()->getrolename() : "UnassignedRole";
@@ -42,10 +36,15 @@ void logEventWithRole(const std::string& message, const Player* player) {
             << message << std::endl;
 }
 
-
-
-
-
+/**
+ * @brief GUI constructor initializes the main window and sets up the game interface.
+ * @param g Reference to the Game object managing game state.
+ * @param parent Parent widget for the GUI.
+ * 
+ * This constructor sets up the main window, initializes layouts, and creates widgets
+ * for adding players and displaying the game screen. It also connects buttons to their
+ * respective slots for handling player actions.
+ */
 GUI::GUI(Game& g, QWidget* parent) : QMainWindow(parent), game(g) {
     logEvent("GUI constructor started");
     resize(900, 1000);
@@ -66,8 +65,6 @@ GUI::GUI(Game& g, QWidget* parent) : QMainWindow(parent), game(g) {
     addPalette.setBrush(QPalette::Window, addBg);
     addPlayerScreen->setAutoFillBackground(true);
     addPlayerScreen->setPalette(addPalette);
-    //addPlayerScreen->setStyleSheet("QWidget { background: transparent; }");
-
 
     QVBoxLayout* addLayout = new QVBoxLayout(addPlayerScreen);
     addLayout->setContentsMargins(250, 600, 250, 200);
@@ -189,7 +186,12 @@ GUI::GUI(Game& g, QWidget* parent) : QMainWindow(parent), game(g) {
 }
 
 
-
+/**
+ * @brief Adds a player to the game.
+ * This method retrieves the player's name from the input field, validates it,
+ * and attempts to add the player to the game. If successful, it logs the event
+ * and clears the input field. If an error occurs, it displays an error message.
+ */
 void GUI::addPlayer() {
     QString name = nameInput->text().trimmed();
     if (name.isEmpty()) return;
@@ -203,11 +205,17 @@ void GUI::addPlayer() {
         errorLabel->setText(e.what());
     }
 }
-
+/**
+    * @brief Starts the game with the current players.
+    * This method initializes the game, sets the gameStarted flag to true,
+    * and updates the player list in the GUI. If an error occurs during game
+    * initialization, it displays an error message.
+ */
 
 void GUI::startGame() {
     try {
         game.startGame();
+        gameStarted = true;
         logEvent("Game started with " + std::to_string(game.playersList().size()) + " players");
 
         // Setup player list
@@ -225,8 +233,14 @@ void GUI::startGame() {
 
 }
 
-// In GUI::handleAction method, replace the blocking section with this:
-
+/**
+    * @brief Handles the action selected by the player.
+    * 
+    * This method creates an action based on the action name, checks if it requires
+    * a target, and prompts the user to select a target if necessary. It also handles
+    * special cases for actions like Arrest, Coup, and blocking actions.
+    * @param actionName The name of the action to handle.
+ */
 void GUI::handleAction(const QString& actionName) {
     try {
         ActionFactory factory;
@@ -286,21 +300,36 @@ void GUI::handleAction(const QString& actionName) {
                 bool coupBlocked = false;
                 
                 if (targetPlayer->getrole() && targetPlayer->getrole()->canblock(*action)) {
-                    QMessageBox::StandardButton reply;
-                    reply = QMessageBox::question(this, "Block Action",
-                        targetName + ", do you want to block the Coup?",
-                        QMessageBox::Yes | QMessageBox::No);
+                    // Special handling for General blocking coup (costs 5 coins)
+                    if (targetPlayer->getrole()->getrolename() == "General") {
+                        if (targetPlayer->getcoins() < 5) {
+                            // General can't afford to block
+                            logEvent("General " + targetName.toStdString() + " cannot block coup - insufficient coins");
+                            QMessageBox::information(this, "Cannot Block", 
+                                targetName + ", you need at least 5 coins to block a Coup. You only have " + 
+                            QString::number(targetPlayer->getcoins()) + " coins.");
+                        } else {
+                            QMessageBox::StandardButton reply;
+                            reply = QMessageBox::question(this, "Block Action",
+                                targetName + ", do you want to pay 5 coins to block the Coup?",
+                                QMessageBox::Yes | QMessageBox::No);
 
-                    if (reply == QMessageBox::Yes) {
-                        try {
-                            logEvent("Coup was blocked by " + targetName.toStdString());
-                            game.getCurrentPlayer()->blockAction("Coup");
-                            game.blockaction(*targetPlayer, *action, *game.getCurrentPlayer());
-                            QMessageBox::information(this, "Blocked", "The Coup was blocked!");
-                            coupBlocked = true;
-                        } catch (const std::exception& e) {
-                            logEvent("Coup block failed");
-                            QMessageBox::warning(this, "Block Failed", e.what());
+                            if (reply == QMessageBox::Yes) {
+                                try {
+                                    // General pays 5 coins to block
+                                    targetPlayer->removecoin(5);
+                                    logEvent("General " + targetName.toStdString() + " paid 5 coins to block coup");
+                                    
+                                    logEvent("Coup was blocked by " + targetName.toStdString());
+                                    game.getCurrentPlayer()->blockAction("Coup");
+                                    game.blockaction(*targetPlayer, *action, *game.getCurrentPlayer());
+                                    QMessageBox::information(this, "Blocked", "The Coup was blocked by General! (Cost: 5 coins)");
+                                    coupBlocked = true;
+                                } catch (const std::exception& e) {
+                                    logEvent("Coup block failed");
+                                    QMessageBox::warning(this, "Block Failed", e.what());
+                                }
+                            }
                         }
                     }
                 }
@@ -333,9 +362,6 @@ void GUI::handleAction(const QString& actionName) {
                 if (reply == QMessageBox::Yes) {
                     try {
                         logEvent("Action '" + actionName.toStdString() + "' was blocked by " + targetName.toStdString());
-                        if (action->isType("Coup")) {
-                            game.getCurrentPlayer()->blockAction("Coup");  // ✅ ADD THIS LINE
-                        }
                         game.blockaction(*targetPlayer, *action, *game.getCurrentPlayer());
                         QMessageBox::information(this, "Blocked", "The action was blocked!");
                         updateGameView();
@@ -404,6 +430,10 @@ void GUI::handleAction(const QString& actionName) {
         QMessageBox::warning(this, "Action Error", e.what());
     }
 }
+/**
+    * @brief Checks if a General can and wants to  block a Coup action
+
+ */
 bool GUI::checkGeneralBlock(int targetIndex, const Action& action) {
     Player* targetPlayer = game.getPlayerByIndex(targetIndex);
     if (!targetPlayer) return false;
@@ -412,8 +442,6 @@ bool GUI::checkGeneralBlock(int targetIndex, const Action& action) {
 
     for (const auto& playerStr : game.playersList()) {
         QString name = QString::fromStdString(playerStr);
-
-        // Skip current player and the target
         if (name == QString::fromStdString(game.turn()) || name == targetName)
             continue;
 
@@ -423,17 +451,27 @@ bool GUI::checkGeneralBlock(int targetIndex, const Action& action) {
             potentialProtector->getrole()->getrolename() == "General" &&
             potentialProtector->getrole()->canblock(action)) {
 
+            if (potentialProtector->getcoins() < 5) {
+                continue; 
+            }
+
             QMessageBox::StandardButton reply = QMessageBox::question(this, "General Block",
-                name + ": Do you want to protect " + targetName + " and block the Coup?",
+                name + ": Do you want to pay 5 coins to protect " + targetName + " and block the Coup?",
                 QMessageBox::Yes | QMessageBox::No);
 
             if (reply == QMessageBox::Yes) {
                 try {
-                    // ADD THIS LINE to mark coup as blocked before calling blockaction
+                    // General pays 5 coins to block
+                    potentialProtector->removecoin(5);
+                    logEvent("General " + potentialProtector->getnameplayer() + 
+                            " paid 5 coins to block coup");
+                    
+                    // Mark coup as blocked
                     game.getCurrentPlayer()->blockAction("Coup");
                     
                     game.blockaction(*potentialProtector, action, *game.getCurrentPlayer());
-                    QMessageBox::information(this, "Blocked", "The Coup was blocked by General!");
+                    QMessageBox::information(this, "Blocked", 
+                        "The Coup was blocked by General! (Cost: 5 coins)");
                     updateGameView();
                     return true;
                 } catch (const std::exception& e) {
@@ -448,7 +486,11 @@ bool GUI::checkGeneralBlock(int targetIndex, const Action& action) {
 }
 
 
-
+/**
+    * @brief Handles the Spy action, allowing the current player to spy on another player.
+    * This method prompts the user to select a player to spy on, retrieves their coin count,
+    * and displays the result in a message box. It also blocks the target from using Arrest next turn.
+ */
 void GUI::handleSpyAction() {
    
     bool ok;
@@ -458,14 +500,12 @@ void GUI::handleSpyAction() {
             items << QString::fromStdString(name);
     }
     QString selected = QInputDialog::getItem(this, "Spy", "Choose a player to spy on:", items, 0, false, &ok);
-    
-    if (!ok) return;
 
+    if (!ok) return;
     int targetIndex = game.getPlayerIndexByName(selected.toStdString());
     if (targetIndex >= 0) {
         Player* current = game.getCurrentPlayer();
         Player* target = game.getPlayerByIndex(targetIndex);
-        std::cout << "[DEBUG] targetIndex: " << targetIndex << ", name: " << target->getnameplayer() << ", address: " << target << std::endl;
         if (current && target && current->getrole()) {
             int others_coins = current->getrole()->rolespecialities(*current, game, target);
             QMessageBox::information(this, "Spy",
@@ -473,13 +513,15 @@ void GUI::handleSpyAction() {
             ". They have " + QString::number(others_coins) + " coins.\n"
             "They are now blocked from using Arrest next turn.");
         }
-
         updateGameView();
     }
 }
+/**
+    * @brief Handles the Baron action, allowing the current player to invest coins.
+    * This method checks if the player has enough coins, performs the investment,
+    * and updates the game state accordingly. It also displays a message box with the result.
+ */
 void GUI::handleBaronAction() {
-    
-
     Player* current = game.getCurrentPlayer();
     logEventWithRole("Baron action triggered", current);
     if (!current || current->getcoins() < 3) {
@@ -499,6 +541,11 @@ void GUI::handleBaronAction() {
 
     updateGameView();
 }
+/**
+    * @brief Handles the Governor action, allowing the current player to block another player's tax action.
+    * This method prompts the user to select a player to block from using Tax, retrieves their index,
+    * and performs the blocking action if valid. It also updates the game view and displays a message box.
+ */
 void GUI::handleGovernorAction() {
     bool ok;
     QStringList items;
@@ -523,6 +570,11 @@ void GUI::handleGovernorAction() {
         updateGameView();
     }
 }
+/**
+ * @brief Handles the Judge action, allowing the current player to block another player's Bribe action.
+ * This method prompts the user to select a player to block from using Bribe, retrieves their index,
+ * and performs the blocking action if valid. It also updates the game view and displays a message box.
+ */
 void GUI::handleJudgeAction() {
     bool ok;
     QStringList items;
@@ -557,23 +609,120 @@ void GUI::handleJudgeAction() {
     }
 }
 
-
+/**
+ * @brief Updates the game view with the current player's status and available actions.
+ * This method checks if the game has a winner, updates the status label with the current player's
+ * name, role, and coin count, and shows or hides action buttons based on the current player's role.
+ */
 void GUI::updateGameView() {
-    std::string current = game.turn();
-    if (current.empty()) {
-        statusLabel->setText("Game Over! Winner: " + QString::fromStdString(game.winner()));
-        actionGroup->setVisible(false);
-        logEvent("Game over. Winner: " + game.winner());
-    } else {
-        QString role = QString::fromStdString(game.getCurrentPlayerRole());
-        int coins = game.getCurrentPlayerCoins();
-        statusLabel->setText("Turn: " + QString::fromStdString(current) + " | Role: " + role + " | Coins: " + QString::number(coins));
-
-        spyButton->setVisible(role == "Spy");
-        BaronButton->setVisible(role == "Baron");
-        GovernorButton->setVisible(role == "Governor");
-        JudgeButton->setVisible(role == "Judge");
+    if (!gameStarted) {
+        return;
     }
+    if (game.playersList().size() == 1) {
+        std::string winnerName = game.winner();
+        statusLabel->setText("Game Over! Winner: " + QString::fromStdString(winnerName));
+        actionGroup->setVisible(false);
+        logEvent("Game over. Winner: " + winnerName);
+        showWinnerDialog();
+        return;
+    }
+    
+    std::string current = game.turn();
+    QString role = QString::fromStdString(game.getCurrentPlayerRole());
+    int coins = game.getCurrentPlayerCoins();
+    statusLabel->setText("Turn: " + QString::fromStdString(current) + " | Role: " + role + " | Coins: " + QString::number(coins));
+
+    spyButton->setVisible(role == "Spy");
+    BaronButton->setVisible(role == "Baron");
+    GovernorButton->setVisible(role == "Governor");
+    JudgeButton->setVisible(role == "Judge");
 }
+
+/**
+ * @brief Displays a dialog showing the winner of the game.
+ * This method creates a custom dialog with the winner's name, a trophy emoji,
+ * and congratulatory messages. It also provides an option to exit the game.
+ */
+void GUI::showWinnerDialog() {
+    QString winner = QString::fromStdString(game.winner());
+    
+    // Create a custom dialog for the winner
+    QDialog* winnerDialog = new QDialog(this);
+    winnerDialog->setWindowTitle("Game Over!");
+    winnerDialog->setFixedSize(400, 300);
+    
+    // Set background style
+    winnerDialog->setStyleSheet(R"(
+        QDialog {
+            background-color: #1a1a1a;
+            border: 3px solid #D4AF37;
+            border-radius: 15px;
+        }
+        QLabel {
+            color: #D4AF37;
+            font-weight: bold;
+        }
+        QPushButton {
+            font-size: 18px;
+            padding: 10px;
+            color: #D4AF37;
+            background-color: rgba(0,0,0,0.6);
+            border: 2px solid #D4AF37;
+            border-radius: 10px;
+            min-width: 150px;
+        }
+        QPushButton:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+    )");
+    
+    QVBoxLayout* layout = new QVBoxLayout(winnerDialog);
+    layout->setAlignment(Qt::AlignCenter);
+    layout->setSpacing(20);
+    
+    // Trophy emoji or crown
+    QLabel* trophyLabel = new QLabel("👑");
+    trophyLabel->setAlignment(Qt::AlignCenter);
+    trophyLabel->setStyleSheet("font-size: 72px;");
+    layout->addWidget(trophyLabel);
+    
+    // Winner announcement
+    QLabel* winnerLabel = new QLabel("WINNER");
+    winnerLabel->setAlignment(Qt::AlignCenter);
+    winnerLabel->setStyleSheet("font-size: 36px; color: #D4AF37;");
+    layout->addWidget(winnerLabel);
+    
+    // Winner name
+    QLabel* nameLabel = new QLabel(winner);
+    nameLabel->setAlignment(Qt::AlignCenter);
+    nameLabel->setStyleSheet("font-size: 48px; color: #F1C40F; font-weight: bold;");
+    layout->addWidget(nameLabel);
+    
+    // Congratulations message
+    QLabel* congratsLabel = new QLabel("Congratulations! You ");
+    congratsLabel->setAlignment(Qt::AlignCenter);
+    congratsLabel->setStyleSheet("font-size: 16px; color: #D4AF37;");
+    layout->addWidget(congratsLabel);
+    
+    // Buttons
+    QHBoxLayout* buttonLayout = new QHBoxLayout();    
+    QPushButton* exitBtn = new QPushButton("Exit");
+    connect(exitBtn, &QPushButton::clicked, [winnerDialog]() {
+        winnerDialog->accept();
+    });
+    
+    buttonLayout->addWidget(exitBtn);
+    layout->addLayout(buttonLayout);
+    
+    int result = winnerDialog->exec();
+    QString clickedButtonText = exitBtn->text();  
+    delete winnerDialog;
+
+    if (result == QDialog::Accepted && clickedButtonText == "Exit") {
+        QApplication::quit();  
+    }
+
+}
+
 
 

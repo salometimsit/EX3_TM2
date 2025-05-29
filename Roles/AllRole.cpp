@@ -73,6 +73,7 @@ bool Spy::canblock(const Action& action) const {
     return action.isType("Arrest");
 }
 std::unique_ptr<SpecialAction> Spy::getspecial(Game& game, Player& user, Player* target ) const{
+    return nullptr;
 }
 
 //---------------------------------------------------------------------------------------------
@@ -93,13 +94,9 @@ int Baron::rolespecialities(Player& currplayer, Game& game, Player* other) const
 void Baron::roleonaction(Player& currplayer, const Action& actionname, Player* other) const {}
 
 void Baron::roledefence(Player& currplayer, const Action& action, Player& other) const {
-    std::cout << "[DEBUG] Baron::roledefence called\n";
     if (action.isType("Sanction")) {
-        std::cout << "[DEBUG] Sanction detected on Baron\n";
         currplayer.addcoin(1);
-    } else {
-        std::cout << "[DEBUG] Action is not Sanction\n";
-    }
+    } 
 }
 
 bool Baron::canblock(const Action& action) const {
@@ -167,7 +164,7 @@ void Merchant::roledefence(Player& currplayer, const Action& action, Player& oth
 bool Merchant::canblock(const Action& action) const {
     return false;
 }
-std::unique_ptr<SpecialAction> Merchant::getspecial(Game& game, Player& user, Player* target) const {}
+std::unique_ptr<SpecialAction> Merchant::getspecial(Game& game, Player& user, Player* target) const {return nullptr;}
 
 //---------------------------------------------------------------------------------------------
 /** General Implementation **/
@@ -193,4 +190,4 @@ void General::roledefence(Player& currplayer, const Action& action, Player& othe
 bool General::canblock(const Action& action) const {
     return action.isType("Coup");
 }
-std::unique_ptr<SpecialAction> General:: getspecial(Game& game, Player& user, Player* target) const {}
+std::unique_ptr<SpecialAction> General:: getspecial(Game& game, Player& user, Player* target) const {return nullptr;}

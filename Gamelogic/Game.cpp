@@ -45,7 +45,6 @@ void Game::addPlayer(const string& name) {
     // Add a player if we haven't reached the max player count
     Player* player = new Player(name);
     if (playerManager.addPlayer(player)) {
-        cout << "Player " << name << " added to the game." << endl;
     } else {
         throw std::runtime_error("Maximum number of players reached");
     }
@@ -61,8 +60,6 @@ void Game::startGame() {
         }
     }
     if (playerManager.isplayervalid()) {
-        cout << "Game started with " << playerManager.players.size() << " players." << endl;
-      
         currentPlayerIndex = 0;
         gameOver = false;
     } else {
@@ -109,8 +106,6 @@ void Game::playTurn(const Action& action, int targetIndex) {
         throw std::runtime_error("You have more than 10 coins. You must play coup.");
     }
 
-    cout << "Players vector size: " << playerManager.players.size() << endl;
-
     if (playerManager.isplayerindexvalid(targetIndex)) {
         targetPlayer = playerManager.players[targetIndex];
 
@@ -144,15 +139,15 @@ void Game::playTurn(const Action& action, int targetIndex) {
         if (action.isType("Coup")) {
             if (!coupWasBlocked) {
                 playerManager.eliminateplayer(targetIndex);
-                if (targetIndex < currentPlayerIndex) {
+                int curridx = currentPlayerIndex;
+                if (targetIndex < curridx) {
                     currentPlayerIndex--;
                 }
-                if (currentPlayerIndex >= playerManager.players.size()) {
+                size_t plarcount= playerManager.players.size();
+                if (currentPlayerIndex >= plarcount) {
                     currentPlayerIndex = 0;
                 }
             }
-
-            // ✅ Always end turn after Coup (blocked or not)
             clearArrestBlock();
             if (!checkGameOver()) {
                 moveToNextPlayer();
@@ -195,18 +190,14 @@ void Game::moveToNextPlayer() {
     
     // Find the next active player
     int nextIndex = currentPlayerIndex;
+    int currindex= currentPlayerIndex;
     do {
         nextIndex = (nextIndex + 1) % playerCount;
         // Complete one full cycle without finding a player
-        if (nextIndex == currentPlayerIndex) break;
+        if (nextIndex == currindex) break;
     } while (!playerManager.players[nextIndex]);
     
     currentPlayerIndex = nextIndex;
-    // if (playerManager.players[currentPlayerIndex]) {
-    //     playerManager.players[currentPlayerIndex]->unblockAllActions();
-    //     std::cout << "[DEBUG] unblockAllActions() called for player " 
-    //               << playerManager.players[currentPlayerIndex]->getnameplayer() << "\n";
-    // }
 }
 /**
  * @brief Checks if only one player remains.
@@ -214,18 +205,17 @@ void Game::moveToNextPlayer() {
  */
 bool Game::checkGameOver() {
     int activePlayers = 0;
-    int lastIndex = -1;
     
     for (size_t i = 0; i < playerManager.players.size(); i++) {
         if (playerManager.players[i]) {
             activePlayers++;
-            lastIndex = i;
+      
         }
     }
     
     if (activePlayers == 1) {
         gameOver = true;
-        endGame();
+       // endGame();
         return true;
     }
     return false;
@@ -233,16 +223,19 @@ bool Game::checkGameOver() {
 /**
  * @brief Ends the game and announces the winner.
  */
-void Game::endGame() {
-    cout << "Game over. " << winner() << " wins!" << endl;
+// void Game::endGame() {
 
-}
+// }
 
 /**
  * @brief Gets the name of the last remaining player.
  * @return Name of the winner or "No winner" if none found.
  */
 std::string Game::winner() const {
+    if (!gameOver) {
+        throw std::runtime_error("Game is still active - no winner yet");
+    }
+    
     for (const auto& player : playerManager.players) {
         if (player) {
             return player->getnameplayer();

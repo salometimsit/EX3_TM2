@@ -3,3 +3,5 @@
 #include "All_Tests/test_playermanager.cpp"
 #include "All_Tests/test_game.cpp"
 #include "All_Tests/test_allaction.cpp"
+#include "All_Tests/test_rolesonactions.cpp"
+#include "All_Tests/test_gamesimulation.cpp"

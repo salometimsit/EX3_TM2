@@ -5,7 +5,6 @@
 
 Player::~Player() {
     delete role;
-    std::cout << "[DEBUG] Destroying player: " << name << std::endl;
 }
 
 Player::Player(const std::string& name) : name(name), coins(0) {
@@ -69,4 +68,12 @@ Role* Player::assignroles(){
                 default:
                     throw std::runtime_error("Invalid role assignment");
             }
+}
+ void Player::removecoin(int amount){
+    if(coins>=amount){
+        coins-=amount;
+    }
+    else{
+        throw::std::runtime_error("not enough coins");
+    }
 }

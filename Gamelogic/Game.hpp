@@ -39,21 +39,47 @@ public:
     void startGame();
     std::string winner() const;
     
-    void playTurn(const Action& action, int targetIndex=-1);
+    // Play a turn by performing the given action. If the action targets another player, specify the target index.
+    void playTurn(const Action& action, int targetIndex = -1);
+
+    // Advance the turn to the next player in sequence.
     void moveToNextPlayer();
+
+    // Check if the game has reached a win/lose condition.
     bool checkGameOver();
-    void endGame();
+
+    // Finalize the game and perform any necessary cleanup.
+    //void endGame();
+
+    // Return the current number of players in the game.
     int countplayers() const { return playerManager.playerCount(); }
+
+    // Block an action by another player, using the given blocker and action info.
     void blockaction(Player& blocker, const Action& action, Player& attacker);
-    bool canblock(const Action& action) const; // Check if the action can be blocked
-    // Helper methods for GUI
+
+    // Determine whether the specified action is eligible to be blocked.
+    bool canblock(const Action& action) const;
+
+    // Get a list of all player names for display or processing in the GUI.
     std::vector<std::string> playersList();
+
+    // Return the name of the player whose turn it currently is.
     std::string turn() const;
+
+    // Get a pointer to the current player object.
     Player* getCurrentPlayer();
+
+    // Retrieve the current player's coin count.
     int getCurrentPlayerCoins();
+
+    // Get the role of the current player (e.g., Duke, Assassin).
     std::string getCurrentPlayerRole();
+
+    // Find the index of a player by their name.
     int getPlayerIndexByName(const std::string& name);
+
+    // Retrieve a player object by their index in the player list.
     Player* getPlayerByIndex(int index);
 };
 
-#endif // GAME_HPP
+#endif 

@@ -10,7 +10,6 @@
 
 PlayerManager::~PlayerManager() {
     for (Player* p : players) {
-        std::cout << "[DEBUG] Deleting from PlayerManager: " << p->getnameplayer() << std::endl;
         delete p;
     }
 }
@@ -53,8 +52,10 @@ size_t PlayerManager::playerCount() const {
     return players.size();
 }
 Player* PlayerManager::getPlayerByIndex(int index) {
-    if (index >= 0 && index < players.size() && players[index]) {
+    int size= players.size();
+    if (index >= 0 && index <size && players[index]) {
         return players[index];
+        
     }
     return nullptr;
 }

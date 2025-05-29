@@ -105,6 +105,10 @@ class Governorblocktax: public SpecialAction {
         bool isspecial(const std::string& roleName) const override;
 };
 //--------------------------------------------------------------------------------------------
+/**
+ * @class Judgeblockbribe
+ * @brief A special action that allows the "Judge" to block a bribe.
+ */
 class Judgeblockbribe : public SpecialAction {
 public:
     std::string getactionname() const override { return "Judgeblockbribe"; }

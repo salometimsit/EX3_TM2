@@ -114,7 +114,7 @@ TEST_CASE("Arrest throws if target has 0 coins") {
     delete target;
 }
 TEST_CASE("Coup throws if not enough coins") {
-    Player* attacker = makeplayerforaction("A", nullptr, 6);  // not enough
+    Player* attacker = makeplayerforaction("A", nullptr, 6); 
     Player* target = makeplayerforaction("T", nullptr, 5);
     Coup c;
     CHECK_THROWS(c.playcard(*attacker, *target));
@@ -122,7 +122,7 @@ TEST_CASE("Coup throws if not enough coins") {
     delete target;
 }
 TEST_CASE("Sanction throws if not enough coins") {
-    Player* attacker = makeplayerforaction("S", nullptr, 2);  // needs 3
+    Player* attacker = makeplayerforaction("S", nullptr, 2);  
     Player* target = makeplayerforaction("T", nullptr, 5);
     Sanction s;
     CHECK_THROWS(s.playcard(*attacker, *target));
@@ -138,13 +138,13 @@ TEST_CASE("Baroninvest throws if not enough coins") {
 TEST_CASE("Governorblocktax does nothing when used alone") {
     Player* gov = makeplayerforaction("Gov", new Governor(), 5);
     Governorblocktax gbt;
-    CHECK_NOTHROW(gbt.playcard(*gov));  // this version has empty body
+    CHECK_NOTHROW(gbt.playcard(*gov));  
     delete gov;
 }
 TEST_CASE("Calling single-player Arrest has no effect") {
     Player* p = makeplayerforaction("Solo", nullptr, 5);
     Arrest a;
-    CHECK_NOTHROW(a.playcard(*p));  // Defined to do nothing
+    CHECK_NOTHROW(a.playcard(*p));  
     CHECK(p->getcoins() == 5);
     delete p;
 }

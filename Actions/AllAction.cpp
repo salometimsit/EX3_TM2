@@ -98,7 +98,6 @@ void Sanction::playcard(Player& currplayer, Player& other) const {
     currplayer.removecoin(3);
     other.blockAction("Tax");
     other.blockAction("Gather");
-    std::cout << "[DEBUG] " << other.getnameplayer() << " was sanctioned (Tax & Gather blocked)\n";
 }
 //--------------------------------------------------------------------------------------------
 /** Tax Action Implementation **/
@@ -153,14 +152,14 @@ bool Governorblocktax::isspecial(const std::string& roleName) const{
     }
     return false;
 }
-
+//--------------------------------------------------------------------------------------------
+/** Judgeblockbribe Action Implementation **/
 void Judgeblockbribe::playcard(Player& currplayer) const {
     // No effect on current player
 }
 
 void Judgeblockbribe::playcard(Player& currplayer, Player& other) const {
     other.blockAction("Bribe");
-    std::cout << "[DEBUG] " << other.getnameplayer() << " is now blocked from using Bribe this turn\n";
 }
 
 bool Judgeblockbribe::isType(const std::string& type) const {

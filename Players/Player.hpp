@@ -40,7 +40,7 @@ class Player{
         void setname(const string& n){name=n;}
         void setrole(Role* r);
         void addcoin(int amount); 
-        void removecoin(int amount){if(coins>=amount){coins-=amount;}else{throw::std::runtime_error("not enough coins");}}//return error if amount>valid 
+        void removecoin(int amount);
         
 };
 #endif
