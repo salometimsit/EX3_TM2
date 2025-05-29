@@ -1,4 +1,4 @@
-
+//timsitmelosa@gmail.com
 #include "doctest.h"
 #include "Players/Player.hpp"
 #include "Roles/RoleFactory.hpp"

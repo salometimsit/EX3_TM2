@@ -1,3 +1,4 @@
+//timsitmelosa@gmail.com
 #include <QApplication>
 #include "Gamelogic/GUI.hpp"
 #include "Gamelogic/Game.hpp"

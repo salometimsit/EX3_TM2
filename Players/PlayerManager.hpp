@@ -1,3 +1,4 @@
+//timsitmelosa@gmail.com
 #ifndef PLAYERMANAGER_HPP
 #define PLAYERMANAGER_HPP
 #include <iostream>

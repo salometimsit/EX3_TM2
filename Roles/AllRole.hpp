@@ -1,3 +1,4 @@
+//timsitmelosa@gmail.com
 #ifndef ALLROLE_HPP
 #define ALLROLE_HPP
 

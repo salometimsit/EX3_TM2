@@ -1,3 +1,4 @@
+//timsitmelosa@gmail.com
 #include "RoleFactory.hpp"
 #include "AllRole.hpp"
 #include "Actions/ActionFactory.hpp"

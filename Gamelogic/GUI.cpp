@@ -1,4 +1,4 @@
-
+//timsitmelosa@gmail.com
 #include "Gamelogic/GUI.hpp"
 #include <QInputDialog>
 #include <fstream>

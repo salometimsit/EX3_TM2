@@ -1,3 +1,4 @@
+//timsitmelosa@gmail.com
 #ifndef ROLE_FACTORY_HPP
 #define ROLE_FACTORY_HPP
 

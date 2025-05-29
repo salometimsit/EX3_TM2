@@ -1,3 +1,4 @@
+//timsitmelosa@gmail.com
 #ifndef ALLACTION_HPP
 #define ALLACTION_HPP
 #include "SpecialActions.hpp"

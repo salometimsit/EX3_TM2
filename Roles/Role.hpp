@@ -1,3 +1,4 @@
+//timsitmelosa@gmail.com
 #ifndef ROLE_HPP
 #define ROLE_HPP
 #include <string>

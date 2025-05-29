@@ -1,4 +1,4 @@
-// Game.cpp
+//timsitmelosa@gmail.com
 #include "Gamelogic/Game.hpp"
 #include "Players/Player.hpp"
 #include "Players/PlayerManager.hpp"

@@ -1,4 +1,4 @@
-
+//timsitmelosa@gmail.com
 #include "Players/Player.hpp"
 #include "Roles/RoleFactory.hpp"
 #include <random>

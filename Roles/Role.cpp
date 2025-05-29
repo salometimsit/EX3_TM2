@@ -1,3 +1,4 @@
+//timsitmelosa@gmail.com
 #include "Role.hpp"
 
 // Provide a definition for the virtual destructor

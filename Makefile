@@ -1,3 +1,4 @@
+#timsitmelosa@gmail.com
 CXX = g++
 CXXFLAGS = -std=c++17 -Wall -fPIC -I. -IAll_Test -IGamelogic
 QTFLAGS = $(shell pkg-config --cflags --libs Qt5Widgets)

@@ -1,4 +1,4 @@
-// Game.hpp - Improved
+//timsitmelosa@gmail.com
 #ifndef GAME_HPP
 #define GAME_HPP
 #pragma once

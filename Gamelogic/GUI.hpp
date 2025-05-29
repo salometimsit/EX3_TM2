@@ -1,3 +1,4 @@
+//timsitmelosa@gmail.com
 #ifndef GUI_HPP
 #define GUI_HPP
 #include <QMainWindow>

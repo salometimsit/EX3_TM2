@@ -1,0 +1,49 @@
+GUI constructor started
+AddPlayer screen loaded
+Player added: 1
+Player added: 2
+Player added: 3
+Game started with 3 players
+[Before] Tax by 1 (Coins: 0)
+(1 | Role: Baron | Coins: 0) Attempting action: Tax
+[After] Tax by 1 (Coins: 2)
+[Before] Tax by 2 (Coins: 0)
+(2 | Role: Judge | Coins: 0) Attempting action: Tax
+[After] Tax by 2 (Coins: 2)
+[Before] Tax by 3 (Coins: 0)
+(3 | Role: Baron | Coins: 0) Attempting action: Tax
+[After] Tax by 3 (Coins: 2)
+[Before] Tax by 1 (Coins: 2)
+(1 | Role: Baron | Coins: 2) Attempting action: Tax
+[After] Tax by 1 (Coins: 4)
+[Before] Tax by 2 (Coins: 2)
+(2 | Role: Judge | Coins: 2) Attempting action: Tax
+[After] Tax by 2 (Coins: 4)
+[Before] Tax by 3 (Coins: 2)
+(3 | Role: Baron | Coins: 2) Attempting action: Tax
+[After] Tax by 3 (Coins: 4)
+[Before] Tax by 1 (Coins: 4)
+(1 | Role: Baron | Coins: 4) Attempting action: Tax
+[After] Tax by 1 (Coins: 6)
+[Before] Tax by 2 (Coins: 4)
+(2 | Role: Judge | Coins: 4) Attempting action: Tax
+[After] Tax by 2 (Coins: 6)
+(3 | Role: Baron | Coins: 4) Baron action triggered
+(1 | Role: Baron | Coins: 6) Baron action triggered
+[Before] Judge Block Bribe by 2 on 1
+[After] Judge Block Bribe - turn advanced
+[Before] Tax by 3 (Coins: 7)
+(3 | Role: Baron | Coins: 7) Attempting action: Tax
+[After] Tax by 3 (Coins: 9)
+[Before] Tax by 1 (Coins: 9)
+(1 | Role: Baron | Coins: 9) Attempting action: Tax
+[After] Tax by 1 (Coins: 11)
+[Before] Gather by 2 (Coins: 6)
+(2 | Role: Judge | Coins: 6) Attempting action: Gather
+[After] Gather by 2 (Coins: 7)
+[Before] Gather by 3 (Coins: 9)
+(3 | Role: Baron | Coins: 9) Attempting action: Gather
+[After] Gather by 3 (Coins: 10)
+[Before] Tax by 1 (Coins: 11)
+(1 | Role: Baron | Coins: 11) Attempting action: Tax
+ACTION FAILED: Tax by 1 — ERROR: You have more than 10 coins. You must play coup.

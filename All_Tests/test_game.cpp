@@ -1,4 +1,4 @@
-
+//timsitmelosa@gmail.com
 #include "doctest.h"
 #include "Gamelogic/Game.hpp"
 #include "Roles/AllRole.hpp"
