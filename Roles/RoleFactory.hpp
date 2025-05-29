@@ -13,6 +13,7 @@
  * 
  * Uses the Factory design pattern to abstract the construction of specific Role subclasses.
  */
+ 
 class RoleFactory {
 
     public:

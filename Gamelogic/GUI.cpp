@@ -35,7 +35,6 @@ void logEventWithRole(const std::string& message, const Player* player) {
     logFile << "(" << name << " | Role: " << role << " | Coins: " << coins << ") "
             << message << std::endl;
 }
-
 /**
  * @brief GUI constructor initializes the main window and sets up the game interface.
  * @param g Reference to the Game object managing game state.

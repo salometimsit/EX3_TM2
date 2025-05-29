@@ -4,6 +4,7 @@
 #include "SpecialActions.hpp"
 #include "Action.hpp"
 
+
 /**
  * @class Arrest
  * @brief Represents an "Arrest" action in the game.

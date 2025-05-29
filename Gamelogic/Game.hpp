@@ -71,7 +71,6 @@ public:
 
     // Retrieve the current player's coin count.
     int getCurrentPlayerCoins();
-
     // Get the role of the current player (e.g., Duke, Assassin).
     std::string getCurrentPlayerRole();
 

@@ -1,7 +1,6 @@
 //timsitmelosa@gmail.com
 #ifndef ALLROLE_HPP
 #define ALLROLE_HPP
-
 #include "Role.hpp"
 #include "Players/Player.hpp"
 #include "Actions/Action.hpp"

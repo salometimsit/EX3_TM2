@@ -3,7 +3,6 @@
 #define SPECIAL_ACTIONS_HPP
 #include "Action.hpp"
 #include <string>
-
 /**
  * @class SpecialAction
  * @brief Abstract class for role-specific special actions.

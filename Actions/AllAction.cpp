@@ -3,7 +3,6 @@
 #include "Players/Player.hpp"
 #include <iostream>
 
-
 /** Arrest Action Implementation **/
 std::string Arrest::getactionname() const {
     return "Arrest";

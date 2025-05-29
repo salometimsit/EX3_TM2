@@ -10,6 +10,7 @@ class Game;
 class Actionstrategy;
 class Player;
 class Action;
+
 /**
  * @class Role
  * @brief Abstract base class for defining player roles in the game.

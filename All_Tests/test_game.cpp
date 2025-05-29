@@ -3,7 +3,6 @@
 #include "Gamelogic/Game.hpp"
 #include "Roles/AllRole.hpp"
 #include "Actions/AllAction.hpp"
-
 TEST_CASE("Game throws on start with only one player") {
     Game game;
     game.addPlayer("OnlyOne");

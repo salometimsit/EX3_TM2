@@ -10,6 +10,7 @@
  * @return std::unique_ptr<Role> A unique pointer to the created Role object.
  * @throws std::invalid_argument If the role name does not match any known Role type.
  */
+ 
 Role* RoleFactory::createRole(const std::string& roleName) {
     if (roleName == "Governor") {
         return new Governor();

@@ -2,6 +2,7 @@
 #ifndef ACTION_HPP
 #define ACTION_HPP
 #include <string>
+
 class Player;
 class Game;
 /**

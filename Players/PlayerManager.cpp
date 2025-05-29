@@ -8,7 +8,6 @@
 #include <random>
 #include <algorithm>
 
-
 PlayerManager::~PlayerManager() {
     for (Player* p : players) {
         delete p;

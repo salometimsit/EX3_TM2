@@ -2,7 +2,6 @@
 CXX = g++
 CXXFLAGS = -std=c++17 -Wall -fPIC -I. -IAll_Test -IGamelogic
 QTFLAGS = $(shell pkg-config --cflags --libs Qt5Widgets)
-
 SRC = main.cpp \
       Gamelogic/GUI.cpp \
       Gamelogic/moc_GUI.cpp \

@@ -4,7 +4,6 @@
 #include "Actions/AllAction.hpp"
 #include "Roles/AllRole.hpp"
 #include "Players/Player.hpp"
-
 TEST_CASE("Full game simulation with all roles") {
     Game game;
     

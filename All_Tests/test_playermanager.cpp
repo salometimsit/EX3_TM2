@@ -8,7 +8,6 @@
 #include "Actions/AllAction.hpp"
 #include "Gamelogic/Game.hpp"
 
-
 TEST_CASE("Getting role of invalid player index returns 'Unknown'") {
     PlayerManager manager;
     CHECK(manager.getPlayerRole(0) == "Unknown");

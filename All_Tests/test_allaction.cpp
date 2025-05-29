@@ -4,7 +4,6 @@
 #include "Actions/AllAction.hpp"
 #include "Roles/AllRole.hpp"
 #include "Players/Player.hpp"
-
 // עוזר ליצירת שחקנים עם תפקיד
 Player* makeplayerforaction(const std::string& name, Role* role = nullptr, int coins = 0) {
     Player* p = new Player(name);

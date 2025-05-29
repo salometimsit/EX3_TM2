@@ -5,6 +5,7 @@
 #include "Roles/AllRole.hpp"
 #include "Players/Player.hpp"
 
+
 TEST_CASE("Governor successfully blocks Coup") {
     Game game;
     game.addPlayer("Attacker");

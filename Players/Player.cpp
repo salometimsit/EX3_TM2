@@ -2,7 +2,6 @@
 #include "Players/Player.hpp"
 #include "Roles/RoleFactory.hpp"
 #include <random>
-
 Player::~Player() {
     delete role;
 }

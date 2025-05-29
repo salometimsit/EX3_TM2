@@ -2,6 +2,7 @@
 
 A multiplayer strategy game implementation inspired by the card game Coup, featuring unique roles, special abilities, and strategic gameplay mechanics.
 
+
 ## 🎮 Game Overview
 
 This is a turn-based elimination game where players use actions to gain coins and eliminate opponents. The last player standing wins. Each player is assigned a secret role that grants unique abilities and defensive options.

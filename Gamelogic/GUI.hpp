@@ -11,7 +11,6 @@
 
 #include <vector>
 #include "Gamelogic/Game.hpp"
-
 // Logs a general event message (not tied to a specific player)
 void logEvent(const std::string& message);
 // Logs an event message related to a specific player and their role

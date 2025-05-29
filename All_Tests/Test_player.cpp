@@ -3,8 +3,6 @@
 #include "Players/Player.hpp"
 #include "Roles/RoleFactory.hpp"
 
-
-
 TEST_CASE("Player name setter and getter") {
     Player p("Temp");
     p.setname("NewName");

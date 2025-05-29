@@ -11,7 +11,6 @@
 #include <algorithm>
 using std::unique_ptr;
 struct PlayerManager{
-    //instead of define works for compiler +11 
     public:
         static constexpr int MIN_PLAYERS = 2;
         static constexpr int MAX_PLAYERS = 6;
@@ -23,8 +22,6 @@ struct PlayerManager{
         bool isplayerindexvalid(int index)const;
         void eliminateplayer(int index);
         size_t playerCount() const;
-        //void assignroles()
-
         Player* getPlayerByIndex(int index);
         int getPlayerIndex(const std::string& playerName);
         int getPlayerCoins(int index);
