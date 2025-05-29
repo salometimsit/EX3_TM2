@@ -101,7 +101,6 @@ This is a turn-based elimination game where players use actions to gain coins an
 ### Design Patterns Used
 - **Factory Pattern**: For creating actions and roles
 - **Strategy Pattern**: For role behaviors and action execution
-- **Observer Pattern**: GUI updates based on game state changes
 
 ## 🚀 Getting Started
 
