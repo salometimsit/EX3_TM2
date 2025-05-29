@@ -115,7 +115,11 @@ This is a turn-based elimination game where players use actions to gain coins an
 # Using makefile run:
 make 
 ./coup_game
-
+#Running tests:
+make run_tests
+./run_tests
+#Running valgrind:
+make valgrind-tests
 ## 🎮 How to Play
 
 1. **Start Screen**: Add 2-6 players by entering their names
